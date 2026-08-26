@@ -1,0 +1,56 @@
+{
+    "name": "mage-os/module-netsuite-connector",
+    "description": "NetSuite integration for Mage-OS and Magento 2 Open Source",
+    "type": "magento2-module",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "authors": [
+        {
+            "name": "Rocket Web Inc.",
+            "email": "info@rocketweb.com"
+        },
+        {
+            "name": "Mage-OS"
+        }
+    ],
+    "require": {
+        "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+        "magento/framework": "^103.0 || ^104.0",
+        "myclabs/php-enum": "^1.8",
+        "ryanwinchester/netsuite-php": "^2024.2"
+    },
+    "replace": {
+        "paragonie/random_compat": "*",
+        "rocketweb/netsuite-connector": "*",
+        "rocketweb/netsuite-connector-customer": "*",
+        "rocketweb/netsuite-connector-customer-import": "*",
+        "rocketweb/netsuite-connector-discount": "*",
+        "rocketweb/netsuite-connector-inventory": "*",
+        "rocketweb/netsuite-connector-inventory-multi-management": "*",
+        "rocketweb/netsuite-connector-inventory-single-management": "*",
+        "rocketweb/netsuite-connector-invoice": "*",
+        "rocketweb/netsuite-connector-order": "*",
+        "rocketweb/netsuite-connector-product": "*",
+        "rocketweb/netsuite-connector-product-images": "*",
+        "rocketweb/netsuite-connector-queue": "*",
+        "rocketweb/netsuite-connector-refund": "*",
+        "rocketweb/netsuite-connector-shipment": "*",
+        "rocketweb/netsuite-connector-shipment-multi-source": "*",
+        "rocketweb/netsuite-connector-shipment-single-source": "*",
+        "rocketweb/netsuite-connector-tax": "*",
+        "weew/helpers-array": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "MageOS\\NetSuiteConnector\\": ""
+        }
+    },
+    "scripts": {
+        "phpcs": "phpcs --standard=Magento2"
+    }
+}

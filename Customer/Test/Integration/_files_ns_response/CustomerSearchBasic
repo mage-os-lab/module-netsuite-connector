@@ -1,0 +1,21 @@
+<?php
+if (!isset($success)) {
+    throw new \Exception(sprintf('file %s missing $success', __FILE__));
+}
+
+$response = new \NetSuite\Classes\SearchResponse();
+$response->searchResult = new \NetSuite\Classes\SearchResult();
+$response->searchResult->totalRecords = $success ? 1 : 0;
+
+if ($success) {
+    if (!isset($netsuiteId)) {
+        throw new \Exception(sprintf('file %s missing $netsuiteId', __FILE__));
+    }
+
+    $response->searchResult->recordList = new \NetSuite\Classes\RecordList();
+    $response->searchResult->recordList->record = [];
+    $response->searchResult->recordList->record[0] = new \NetSuite\Classes\Customer();
+    $response->searchResult->recordList->record[0]->internalId = $netsuiteId;
+}
+
+return $response;

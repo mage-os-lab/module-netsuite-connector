@@ -1,0 +1,19 @@
+<?php
+
+$searchResponse = new \NetSuite\Classes\SearchResponse();
+$searchResponse->searchResult = new \NetSuite\Classes\SearchResult();
+$searchResponse->searchResult->status = new \NetSuite\Classes\Status();
+$searchResponse->searchResult->status->isSuccess = $success;
+$searchResponse->searchResult->searchRowList = new \NetSuite\Classes\SearchRowList();
+$row = new \NetSuite\Classes\ItemSearchRow();
+$row->basic = new \NetSuite\Classes\ItemSearchRowBasic();
+$internalId = new \NetSuite\Classes\SearchColumnSelectField();
+$internalId->searchValue = new \NetSuite\Classes\RecordRef();
+$internalId->searchValue->internalId = '1';
+$row->basic->internalId = [$internalId];
+$row->basic->quantityOnHand = [];
+$row->basic->quantityOnHand[0] = new \NetSuite\Classes\SearchColumnDoubleField();
+$row->basic->quantityOnHand[0]->searchValue = 200.0;
+$searchResponse->searchResult->searchRowList->searchRow = [$row];
+
+return $searchResponse;

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+  ~ RocketWeb
+  ~
+  ~ NOTICE OF LICENSE
+  ~
+  ~ This source file is subject to the Open Software License (OSL 3.0)
+  ~ that is bundled with this package in the file LICENSE.txt.
+  ~ It is also available through the world-wide-web at this URL:
+  ~ http://opensource.org/licenses/osl-3.0.php
+  ~
+  ~ @category  RocketWeb
+  ~ @package   MageOS_NetSuiteConnector
+  ~ @copyright Copyright (c) 2026 RocketWeb (http://rocketweb.com)
+  ~ @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+  ~ @author    Rocket Web Inc.
+  ~
+  ~
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
+    <extension_attributes for="Magento\Customer\Api\Data\GroupInterface">
+        <attribute code="netsuite_internal_id" type="string">
+            <join reference_table="mageos_netsuite_customer_group"
+                  join_on_field="customer_group_id"
+                  reference_field="customer_group_id"
+            >
+                <field>netsuite_internal_id</field>
+            </join>
+        </attribute>
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="netsuite_internal_id" type="string"/>
+        <attribute code="netsuite_last_import_date" type="string"/>
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\InvoiceInterface">
+        <attribute code="netsuite_internal_id" type="string"/>
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\CreditmemoInterface">
+        <attribute code="netsuite_internal_id" type="string"/>
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\ShipmentInterface">
+        <attribute code="netsuite_internal_id" type="string"/>
+        <attribute code="netsuite_last_import_date" type="string"/>
+    </extension_attributes>
+</config>

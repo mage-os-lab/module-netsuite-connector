@@ -1,0 +1,8 @@
+<?php
+$response = new \NetSuite\Classes\GetResponse();
+$response->readResponse = new \NetSuite\Classes\ReadResponse();
+$response->readResponse->status = new \NetSuite\Classes\Status();
+$response->readResponse->status->isSuccess = true;
+$response->readResponse->record = new \NetSuite\Classes\Customer();
+$response->readResponse->record->internalId = 2;
+return $response;

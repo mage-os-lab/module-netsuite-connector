@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * RocketWeb
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  RocketWeb
+ * @package   MageOS_NetSuiteConnector
+ * @copyright Copyright (c) 2026 RocketWeb (http://rocketweb.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Rocket Web Inc.
+ *
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="mageos_netsuite_message" comment="Queue table for the Mage-OS NetSuite Connector">
+        <column xsi:type="bigint" name="message_id" nullable="false" identity="true" unsigned="true" />
+        <column xsi:type="varchar" name="queue" nullable="false" length="20" comment="Queue Type enum"/>
+        <column xsi:type="longtext" name="body" nullable="true" comment="Message Payload"/>
+        <column xsi:type="varchar" name="item_id" nullable="true" length="25" comment="Item Id"/>
+        <column xsi:type="varchar" name="action" nullable="true" length="25" comment="Action"/>
+        <column xsi:type="smallint" name="number_of_trials" unsigned="true" nullable="false"
+                identity="false" default="0" comment="Number of trials to processed failed message processing"/>
+        <column xsi:type="timestamp" name="picked_at" nullable="true" comment="Timestamp when message gets picked up"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="48" comment="Message Status enum"/>
+        <column xsi:type="int" name="priority" nullable="true" comment="Priority of processing"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="message_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="CONNECTOR_QUEUE_QUEUE_MESSAGE_ID_UNIQUE">
+            <column name="queue"/>
+            <column name="message_id"/>
+        </constraint>
+        <index referenceId="CONNECTOR_QUEUE_STATUS_STATUS_UPDATED_AT" indexType="btree">
+            <column name="status"/>
+            <column name="updated_at"/>
+        </index>
+    </table>
+
+    <table name="mageos_netsuite_monitor" resource="default" engine="innodb"
+           comment="Relation table to monitor queue messages">
+        <column xsi:type="bigint" name="monitor_id" nullable="false" identity="true" unsigned="true" />
+        <column xsi:type="bigint" name="message_id" nullable="false" unsigned="true" />
+        <column xsi:type="varchar" name="process" nullable="false" length="10" comment="ItemProcess enum"/>
+        <column xsi:type="varchar" name="entity" nullable="false" length="64" comment="Entity/Record types"/>
+        <column xsi:type="bigint" name="item_id" unsigned="true" nullable="false" comment="Entity/Record ID"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Message added to Queue"/>
+        <column xsi:type="datetime" name="processed_at" comment="Message cleared from Queue" nullable="true"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="48" comment="ItemStatus enum"/>
+        <column xsi:type="int" name="counter" unsigned="true" nullable="false" comment="Retry counter"/>
+        <column xsi:type="boolean" name="has_payload" nullable="false" default="false" comment="Item has payload"/>
+        <column xsi:type="longtext" name="payload" nullable="true" comment="Item Payload in JSON format"/>
+        <column xsi:type="varchar" name="payload_instance" nullable="true" length="128" comment="Payload Instance"/>
+        <column xsi:type="boolean" name="overwrite_payload" nullable="false" default="false"
+                comment="Overwrite the import/export data"/>
+        <column xsi:type="text" name="process_output" nullable="true" comment="Process Output in JSON format (array)"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="monitor_id"/>
+        </constraint>
+        <index referenceId="CONNECTOR_MONITOR_MESSAGE_ID" indexType="btree">
+            <column name="message_id"/>
+        </index>
+    </table>
+    <table name="mageos_netsuite_bundle_product_link" resource="default" engine="innodb" comment="Catalog Product Bundle NetSuite Link">
+        <column xsi:type="int" name="link_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Option Id"/>
+        <column xsi:type="int" name="product_id" padding="10" unsigned="true" nullable="false" identity="false"
+                comment="Product Id"/>
+        <column xsi:type="int" name="netsuite_internal_id" padding="10" unsigned="true" nullable="false" identity="false"
+                comment="Parent Id"/>
+        <column xsi:type="varchar" name="option_sku" nullable="true" length="64" comment="Option SKU"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="link_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_NETSUITE_BNDL_PRD_LNK_PRD_ID_CAT_PRD_ENTT_ENTT_ID"
+                    table="mageos_netsuite_bundle_product_link" column="product_id" referenceTable="catalog_product_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="MAGEOS_NETSUITE_BUNDLE_PRODUCT_LINK_PRODUCT_ID" indexType="btree">
+            <column name="product_id"/>
+        </index>
+    </table>
+    <table name="mageos_netsuite_customer_group" resource="default" engine="innodb" comment="mageos_netsuite_customer_group">
+        <column xsi:type="int" name="customer_group_id" unsigned="true" nullable="false" comment="Customer Group ID"/>
+        <column xsi:type="varchar" name="netsuite_internal_id" nullable="false" length="255" comment="NetSuite internal ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="customer_group_id"/>
+        </constraint>
+        <index referenceId="MAGEOS_NETSUITE_CUSTOMER_GROUP_NETSUITE_INTERNAL_ID" indexType="btree">
+            <column name="netsuite_internal_id"/>
+        </index>
+    </table>
+    <table name="sales_order">
+        <column xsi:type="int" name="netsuite_internal_id" padding="11" unsigned="false" nullable="true"
+                comment="NetSuite internal ID"/>
+        <column xsi:type="datetime" name="netsuite_last_import_date" on_update="false" nullable="true"
+                comment="NetSuite last import date"/>
+        <index referenceId="SALES_ORDER_NETSUITE_INTERNAL_ID" indexType="btree">
+            <column name="netsuite_internal_id"/>
+        </index>
+    </table>
+    <table name="sales_invoice">
+        <column xsi:type="int" name="netsuite_internal_id" padding="11" unsigned="false" nullable="true"
+                comment="NetSuite internal ID"/>
+        <column xsi:type="datetime" name="netsuite_last_import_date" on_update="false" nullable="true" comment="NetSuite last import date"/>
+        <index referenceId="SALES_INVOICE_NETSUITE_INTERNAL_ID" indexType="btree">
+            <column name="netsuite_internal_id"/>
+        </index>
+    </table>
+    <table name="sales_creditmemo">
+        <column xsi:type="int" name="netsuite_internal_id" padding="11" unsigned="false" nullable="true"
+                comment="NetSuite internal ID"/>
+        <column xsi:type="datetime" name="netsuite_last_import_date" on_update="false" nullable="true" comment="NetSuite last import date"/>
+        <index referenceId="SALES_CREDITMEMO_NETSUITE_INTERNAL_ID" indexType="btree">
+            <column name="netsuite_internal_id"/>
+        </index>
+    </table>
+    <table name="sales_shipment">
+        <column xsi:type="int" name="netsuite_internal_id" padding="11" unsigned="false" nullable="true"
+                comment="NetSuite internal ID"/>
+        <column xsi:type="datetime" name="netsuite_last_import_date" on_update="false" nullable="true" comment="NetSuite last import date"/>
+        <index referenceId="SALES_SHIPMENT_NETSUITE_INTERNAL_ID" indexType="btree">
+            <column name="netsuite_internal_id"/>
+        </index>
+    </table>
+    <table name="inventory_source">
+        <column xsi:type="int" name="netsuite_internal_id" padding="11" unsigned="false" nullable="true"
+                comment="NetSuite internal ID"/>
+        <index referenceId="INVENTORY_SOURCE_NETSUITE_INTERNAL_ID" indexType="btree">
+            <column name="netsuite_internal_id"/>
+        </index>
+    </table>
+</schema>

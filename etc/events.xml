@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ RocketWeb
+  ~
+  ~ NOTICE OF LICENSE
+  ~
+  ~ This source file is subject to the Open Software License (OSL 3.0)
+  ~ that is bundled with this package in the file LICENSE.txt.
+  ~ It is also available through the world-wide-web at this URL:
+  ~ http://opensource.org/licenses/osl-3.0.php
+  ~
+  ~ @category  RocketWeb
+  ~ @package   MageOS_NetSuiteConnector
+  ~ @copyright Copyright (c) 2026 RocketWeb (http://rocketweb.com)
+  ~ @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+  ~ @author    Rocket Web Inc.
+  ~
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_before">
+        <observer name="magento_pricepermissions" instance="Magento\PricePermissions\Observer\CatalogProductSaveBeforeObserver" disabled="true" />
+    </event>
+    <event name="netsuite_import_product_format_from_inventory_item_before">
+        <observer name="add_info_before_import" instance="MageOS\NetSuiteConnector\ProductImages\Observer\Mapper\Product\AddInfoToImport"/>
+    </event>
+    <event name="customer_save_after">
+        <observer name="mageos_netsuite_customer_save_after" instance="MageOS\NetSuiteConnector\Customer\Observer\CustomerSaveObserver" />
+    </event>
+    <event name="sales_model_service_quote_submit_success">
+        <observer name="mageos_netsuite_order_place_after" instance="MageOS\NetSuiteConnector\Order\Observer\OrderPlaceObserver"/>
+    </event>
+    <event name="netsuite_new_order_item_send_before">
+        <observer name="set_promotion_amount_and_rules"
+                  instance="MageOS\NetSuiteConnector\Discount\Observer\SetPromotionDataOnItems"/>
+    </event>
+    <event name="sales_order_invoice_save_after">
+        <observer name="mageos_netsuite_sales_invoce_pay" instance="MageOS\NetSuiteConnector\Invoice\Observer\InvoiceSaveAfterObserver"/>
+    </event>
+    <event name="sales_order_shipment_save_after">
+        <observer name="inventory_sales_source_deduction_processor" disabled="true"/>
+    </event>
+</config>

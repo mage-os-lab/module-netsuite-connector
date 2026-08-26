@@ -1,0 +1,21 @@
+<?php
+if (!isset($success)) {
+    throw new \Exception(sprintf('file %s missing $success', __FILE__));
+}
+
+
+$response = new \NetSuite\Classes\AddResponse();
+$response->writeResponse = new \NetSuite\Classes\WriteResponse();
+$response->writeResponse->status = new \NetSuite\Classes\Status();
+
+if ($success == 1) {
+    if (!isset($netsuiteId)) {
+        throw new \Exception(sprintf('file %s missing $netsuiteId', __FILE__));
+    }
+
+    $response->writeResponse->status->isSuccess = true;
+    $response->writeResponse->baseRef = new \NetSuite\Classes\CustomRecordRef();
+    $response->writeResponse->baseRef->internalId = $netsuiteId;
+}
+
+return $response;

@@ -1,0 +1,629 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * RocketWeb
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  RocketWeb
+ * @package   MageOS_NetSuiteConnector
+ * @copyright Copyright (c) 2026 RocketWeb (http://rocketweb.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Rocket Web Inc.
+ *
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!--
+    Magento 2 quirk here. While trying to send an email with $this->shipmentManagementInterface->notify($magentoShipping->getId()); in cron
+    I got the exception "missing required argument $debugHintsPath". This seems to be related to the fact that the below param was set only for admin or frontend,
+    so it had no value for CLI. Setting the "default" to frontend, this should not affect anything as the admin/frontend values will overwrite it anyway.
+    -->
+    <type name="Magento\Developer\Model\TemplateEngine\Plugin\DebugHints">
+        <arguments>
+            <argument name="debugHintsPath" xsi:type="string">dev/debug/template_hints_storefront</argument>
+        </arguments>
+    </type>
+    <!-- Quirk end -->
+
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="netsuitecron" xsi:type="object">MageOS\NetSuiteConnector\Core\Command\NetSuiteCron</item>
+                <item name="netsuitesendqueuewarnings" xsi:type="object">MageOS\NetSuiteConnector\Core\Command\Maintenance\SendQueueWarnings</item>
+                <item name="netsuiteprocesssingleitem" xsi:type="object">MageOS\NetSuiteConnector\Core\Command\Util\ProcessSingleItem</item>
+                <item name="netsuiteprocessrecord" xsi:type="object">MageOS\NetSuiteConnector\Core\Command\Util\ProcessRecord</item>
+                <item name="netsuitecleanmonitor" xsi:type="object">MageOS\NetSuiteConnector\Core\Command\Maintenance\CleanMonitor</item>
+                <item name="netsuiteimportdaterange" xsi:type="object">MageOS\NetSuiteConnector\Core\Command\Util\ProcessRecordsByDateRange</item>
+            </argument>
+        </arguments>
+    </type>
+
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="queue_export_listing_data_source" xsi:type="string">MageOS\NetSuiteConnector\Core\Model\Resource\Queue\Message\ExportCollectionVirt</item>
+                <item name="queue_import_listing_data_source" xsi:type="string">MageOS\NetSuiteConnector\Core\Model\Resource\Queue\Message\ImportCollectionVirt</item>
+                <item name="queue_apilog_listing_data_source" xsi:type="string">MageOS\NetSuiteConnector\Core\Model\Resource\Grid\Apilog\Collection</item>
+                <item name="queue_errorlog_listing_data_source" xsi:type="string">MageOS\NetSuiteConnector\Core\Model\Resource\Grid\ErrorLog\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="MageOS\NetSuiteConnector\Core\Command\NetSuiteCron">
+        <arguments>
+            <argument name="possibleModes" xsi:type="array">
+                <item name="all" xsi:type="string">all</item>
+                <item name="import" xsi:type="string">import</item>
+                <item name="export" xsi:type="string">export</item>
+                <item name="importToQueue" xsi:type="string">importToQueue</item>
+                <item name="processQueue" xsi:type="string">processQueue</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Command\Util\ProcessSingleItem">
+        <arguments>
+            <argument name="importQueue" xsi:type="object">MageOS\NetSuiteConnector\Core\Model\ImportQueueManager\Proxy</argument>
+            <argument name="importProcessor" xsi:type="object">MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor\Proxy</argument>
+            <argument name="exportProcessor" xsi:type="object">MageOS\NetSuiteConnector\Core\Model\Process\ExportProcessor\Proxy</argument>
+            <argument name="messageManagement" xsi:type="object">MageOS\NetSuiteConnector\Core\Api\MessageManagementInterface\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\Repository">
+        <arguments>
+            <argument name="serviceManagement" xsi:type="object">MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\Management\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">NSC</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">MageOS\NetSuiteConnector\Core\Model\Logger\Handler\System</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\ImportQueueManager">
+        <arguments>
+            <argument name="importProcessors" xsi:type="array">
+                <item name="default" xsi:type="object">MageOS\NetSuiteConnector\Core\Model\ImportQueue\EntityProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="monitor_item_listing_data_source" xsi:type="string">MageOS\NetSuiteConnector\Core\Api\MonitorListingCollectionInterface</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="MageOS\NetSuiteConnector\Core\Api\MessageManagementInterface" type="MageOS\NetSuiteConnector\Queue\Model\Queue\MessageManagement"/>
+    <preference for="MageOS\NetSuiteConnector\Core\Api\Data\MessageInterface" type="MageOS\NetSuiteConnector\Queue\Model\Queue\Message"/>
+
+    <preference for="MageOS\NetSuiteConnector\Core\Api\MonitorManagementInterface" type="MageOS\NetSuiteConnector\Queue\Model\Monitor\MonitorManagement"/>
+    <preference for="MageOS\NetSuiteConnector\Core\Api\Data\MonitorItemInterface" type="MageOS\NetSuiteConnector\Queue\Model\Monitor\MonitorItem"/>
+    <preference for="MageOS\NetSuiteConnector\Core\Api\MonitorRegistryInterface" type="MageOS\NetSuiteConnector\Queue\Model\Monitor\MonitorRepository"/>
+    <preference for="MageOS\NetSuiteConnector\Core\Model\Service\Queue\FixStuckMessagesInterface" type="MageOS\NetSuiteConnector\Queue\Model\Queue\Service\FixStuckMessages"/>
+    <!--
+    Yet another Magento quirk. The below preference and type injection are declared only for adminhtml, yet they are needed when programatically saving a product.
+    Declare them in global scope so we can save products from crontab area.
+    -->
+    <preference for="Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper\HandlerInterface" type="Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper\Plugin\Handler\Composite" />
+    <type name="Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper\Plugin\Handler\Composite">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="customOptions" xsi:type="string">Magento\PricePermissions\Controller\Adminhtml\Product\Initialization\Helper\Plugin\Handler\CustomOptions</item>
+                <item name="bundleProducts" xsi:type="string">Magento\PricePermissions\Controller\Adminhtml\Product\Initialization\Helper\Plugin\Handler\ProductType\Bundle</item>
+                <item name="downloadableProducts" xsi:type="string">Magento\PricePermissions\Controller\Adminhtml\Product\Initialization\Helper\Plugin\Handler\ProductType\Downloadable</item>
+                <item name="newObject" xsi:type="string">Magento\PricePermissions\Controller\Adminhtml\Product\Initialization\Helper\Plugin\Handler\NewObject</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Quirk end -->
+
+    <type name="MageOS\NetSuiteConnector\Product\Command\Util\RelinkBySku">
+        <arguments>
+            <argument name="relinkProcessor" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Command\RelinkProcessor\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="MageOS\NetSuiteConnector\Product\Command\Util\ImportSingleProduct">
+        <arguments>
+            <argument name="importSingleProduct" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Import\SingleProduct\Proxy</argument>
+            <argument name="productRepository" xsi:type="object">Magento\Catalog\Api\ProductRepositoryInterface\Proxy</argument>
+            <argument name="netsuiteProductRepository" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\ResourceModel\Repository\Proxy</argument>
+            <argument name="context" xsi:type="object">Magento\Framework\Model\Context\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="netsuiteimportsingleproduct" xsi:type="object">MageOS\NetSuiteConnector\Product\Command\Util\ImportSingleProduct\Proxy</item>
+                <item name="relinkbysku" xsi:type="object">MageOS\NetSuiteConnector\Product\Command\Util\RelinkBySku\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+    Plugins for import/export
+    -->
+    <!-- Allow to execute add/update batch import right after delete -->
+    <preference for="Magento\CatalogImportExport\Model\Import\Product" type="MageOS\NetSuiteConnector\Product\Model\Product\Import\Product" />
+
+    <!-- Modified bundle product import/export to remove bundle options deleted from NetSuite -->
+    <preference for="Magento\BundleImportExport\Model\Import\Product\Type\Bundle" type="MageOS\NetSuiteConnector\Product\Model\Product\Import\Type\Bundle" />
+    <preference for="Magento\ConfigurableImportExport\Model\Import\Product\Type\Configurable" type="MageOS\NetSuiteConnector\Product\Model\Product\Import\Type\Configurable" />
+    <type name="MageOS\NetSuiteConnector\Product\Model\Product\Import\Type\Configurable">
+        <plugin name="import_configurable_product" type="MageOS\NetSuiteConnector\Product\Plugin\ImportExport\Import\Type\Configurable"/>
+    </type>
+    <type name="Magento\ConfigurableProduct\Block\Product\View\Type\Configurable">
+        <plugin name="ns_bundle_renderer_plugin" type="MageOS\NetSuiteConnector\Product\Plugin\ConfigurableBlockPlugin"/>
+    </type>
+
+    <!-- Modified bundle product renderer to display bundle product price information in the invoice -->
+    <type name="Magento\Bundle\Block\Adminhtml\Sales\Order\Items\Renderer">
+        <plugin name="ns_bundle_renderer_plugin" type="MageOS\NetSuiteConnector\Product\Plugin\BundleRendererPlugin"/>
+    </type>
+    <type name="Magento\CatalogImportExport\Model\Import\Product\Type\AbstractType">
+        <plugin name="ns_abstract_type_plugin" type="MageOS\NetSuiteConnector\Product\Plugin\ImportExport\AbstractTypePlugin"/>
+    </type>
+
+    <type name="Magento\CatalogImportExport\Model\Indexer\Product\Flat\Plugin\Import">
+        <plugin name="prevent_flat_index_marking" type="MageOS\NetSuiteConnector\Product\Plugin\PreventMarkIndexInvalid"/>
+    </type>
+    <type name="Magento\CatalogImportExport\Model\Indexer\Category\Product\Plugin\Import">
+        <plugin name="prevent_category_product_index_marking" type="MageOS\NetSuiteConnector\Product\Plugin\PreventMarkIndexInvalid"/>
+    </type>
+    <type name="Magento\CatalogImportExport\Model\Indexer\Product\Category\Plugin\Import">
+        <plugin name="prevent_category_index_marking" type="MageOS\NetSuiteConnector\Product\Plugin\PreventMarkIndexInvalid"/>
+    </type>
+    <type name="Magento\CatalogImportExport\Model\Indexer\Product\Eav\Plugin\Import">
+        <plugin name="prevent_eav_index_marking" type="MageOS\NetSuiteConnector\Product\Plugin\PreventMarkIndexInvalid"/>
+    </type>
+    <type name="Magento\CatalogRule\Plugin\Indexer\ImportExport">
+        <plugin name="prevent_catalogrule_index_marking" type="MageOS\NetSuiteConnector\Product\Plugin\PreventMarkIndexInvalid"/>
+    </type>
+    <type name="Magento\CatalogImportExport\Model\Indexer\Product\Price\Plugin\Import">
+        <plugin name="prevent_price_index_marking" type="MageOS\NetSuiteConnector\Product\Plugin\PreventMarkIndexInvalid"/>
+    </type>
+    <type name="Magento\AdvancedPricingImportExport\Model\Indexer\Product\Price\Plugin\Import">
+        <plugin name="prevent_adv_pricing_index_marking" type="MageOS\NetSuiteConnector\Product\Plugin\ImportExport\PreventAdvPricingInvalidation"/>
+    </type>
+    <type name="Magento\Catalog\Model\Indexer\AbstractFlatState">
+        <plugin name="ns_flat_index_state" type="MageOS\NetSuiteConnector\Product\Plugin\FlatIndexStatePlugin"/>
+    </type>
+
+    <type name="MageOS\NetSuiteConnector\Product\Model\Prefetch\ProductPrefetchIdSource">
+        <arguments>
+            <argument name="sources" xsi:type="array">
+                <item name="relatedProducts" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Prefetch\RelatedProducts\Proxy</item>
+                <item name="upsellProducts" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Prefetch\UpsellProducts\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="inventoryitem" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Process\Import\Item\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process">
+        <plugin name="ns_import_queue_prefeych_products" type="MageOS\NetSuiteConnector\Product\Plugin\ImportQueuePrefetchDataPlugin"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Product\Model\Import\Item\Mapper">
+        <arguments>
+            <argument name="productMappers" xsi:type="array">
+                <item name="default" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Mapper\Product\InventoryItem\Proxy</item>
+                <item name="_matrixItem" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Mapper\Product\MatrixItem\Proxy</item>
+                <item name="_itemGroup" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Mapper\Product\ItemGroup\Proxy</item>
+                <item name="_kitItem" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\Mapper\Product\KitItem\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\ImportQueueManager">
+        <arguments>
+            <argument name="importProcessors" xsi:type="array">
+                <item name="bundle_links" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\ImportQueue\Processor\BundleLinks</item>
+                <item name="advanced_pricing" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\ImportQueue\Processor\AdvancedPricing</item>
+                <item name="catalog_product" xsi:type="object">MageOS\NetSuiteConnector\Product\Model\ImportQueue\Processor\CatalogProduct</item>
+            </argument>
+        </arguments>
+    </type>
+    <!--
+    Plugins for customer groups (add netsuite_internal_id attribite)
+    -->
+    <preference for="Magento\Customer\Block\Adminhtml\Group\Edit\Form" type="MageOS\NetSuiteConnector\Customer\Block\Adminhtml\Group\Edit\Form" />
+
+    <type name="Magento\Customer\Api\GroupRepositoryInterface">
+        <plugin name="ns_grouprepository_plugin" type="\MageOS\NetSuiteConnector\Customer\Model\CustomerGroups\Plugin\GroupRepositoryPlugin"/>
+    </type>
+
+    <type name="Magento\Customer\Controller\Adminhtml\Group\Save">
+        <plugin name="ns_groupadminhtml_save_plugin" type="\MageOS\NetSuiteConnector\Customer\Model\CustomerGroups\Plugin\GroupAdminhtmlSavePlugin"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ExportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="customer_save" xsi:type="object">MageOS\NetSuiteConnector\Customer\Model\Process\Export\CustomerSave\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="CustomerExportProcessor" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\ExportProcessor">
+        <arguments>
+            <argument name="exportModel" xsi:type="object">MageOS\NetSuiteConnector\Customer\Model\Process\Export\CustomerSave\Proxy</argument>
+        </arguments>
+    </virtualType>
+    <type name="MageOS\NetSuiteConnector\Core\Command\Util\ProcessRecord">
+        <arguments>
+            <argument name="cliProcessors" xsi:type="array">
+                <item name="customer_export" xsi:type="object">CustomerExportProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- PLUGINS -->
+    <type name="Magento\Customer\Model\AccountManagement">
+        <plugin sortOrder="10" name="imported_pwd_not_set_change_on_password_reset"
+                type="MageOS\NetSuiteConnector\CustomerImport\Plugin\PasswordResetPlugin"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Customer\Model\Mapper\Customer">
+        <plugin sortOrder="1" name="is_importable_custom_field_set"
+                type="MageOS\NetSuiteConnector\CustomerImport\Plugin\IsImportableSetPlugin"/>
+    </type>
+    <!-- ARGUMENTS -->
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="customer" xsi:type="object">MageOS\NetSuiteConnector\CustomerImport\Model\Process\Import\Customer\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\CustomerImport\Plugin\MessageManagerInterfacePlugin">
+        <arguments>
+            <argument name="customerRepository"
+                      xsi:type="object">Magento\Customer\Api\CustomerRepositoryInterface\Proxy</argument>
+        </arguments>
+    </type>
+    <virtualType name="CustomerImportProcessor" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\ImportProcessor">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MageOS\NetSuiteConnector\CustomerImport\Model\Command\RequestBuilder\CustomerImport</argument>
+            <argument name="importProcessor" xsi:type="object">MageOS\NetSuiteConnector\CustomerImport\Model\Process\Import\Customer\Proxy</argument>
+        </arguments>
+    </virtualType>
+    <type name="MageOS\NetSuiteConnector\Core\Command\Util\ProcessRecord">
+        <arguments>
+            <argument name="cliProcessors" xsi:type="array">
+                <item name="customer_import" xsi:type="object">CustomerImportProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="MageOS\NetSuiteConnector\Order\Api\OrderRegistryInterface" type="MageOS\NetSuiteConnector\Order\Model\OrderRegistry" />
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
+        <plugin name="mageos_netsuite_order_before_save" type="MageOS\NetSuiteConnector\Order\Plugin\BeforeOrderRepositorySave"/>
+    </type>
+    <type name="\Magento\Sales\Model\ResourceModel\Order\Handler\State">
+        <plugin name="mageos_netsuite_around_check_status" type="\MageOS\NetSuiteConnector\Order\Plugin\StateHandler"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="order" xsi:type="object">MageOS\NetSuiteConnector\Order\Model\Process\Import\Order\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ExportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="order_place" xsi:type="object">MageOS\NetSuiteConnector\Order\Model\Process\Export\OrderPlace\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Order\Model\PaymentProcessorPool">
+        <arguments>
+            <argument name="paymentProcessors" xsi:type="array">
+                <item name="check" xsi:type="object">MageOS\NetSuiteConnector\Order\Model\PaymentProcessors\Check</item>
+                <item name="cybersourcetokenized" xsi:type="object">MageOS\NetSuiteConnector\Order\Model\PaymentProcessors\Cybersourcetokenized</item>
+                <item name="paypalexpress" xsi:type="object">MageOS\NetSuiteConnector\Order\Model\PaymentProcessors\Paypalexpress</item>
+                <item name="simple" xsi:type="object">MageOS\NetSuiteConnector\Order\Model\PaymentProcessors\Simple</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Plugin\AddViewInNetSuiteButtons">
+        <arguments>
+            <argument name="buttonProcessors" xsi:type="array">
+                <item name="order_view_button" xsi:type="object">MageOS\NetSuiteConnector\Order\Block\Adminhtml\AddViewButton</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="OrderExportProcessor" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\ExportProcessor">
+        <arguments>
+            <argument name="exportModel" xsi:type="object">MageOS\NetSuiteConnector\Order\Model\Process\Export\OrderPlace\Proxy</argument>
+        </arguments>
+    </virtualType>
+    <type name="MageOS\NetSuiteConnector\Core\Command\Util\ProcessRecord">
+        <arguments>
+            <argument name="cliProcessors" xsi:type="array">
+                <item name="order_export" xsi:type="object">OrderExportProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="MageOS\NetSuiteConnector\Tax\Api\TaxInterface" type="MageOS\NetSuiteConnector\Tax\Model\Tax"/>
+    <type name="MageOS\NetSuiteConnector\Tax\Model\Tax">
+        <arguments>
+            <argument name="orderTaxManagers" xsi:type="array">
+                <item name="netsuite_processor"
+                      xsi:type="object">MageOS\NetSuiteConnector\Tax\Model\Order\Export\TaxManager\NetSuiteTaxProcessor\Proxy</item>
+                <item name="tax_item_line"
+                      xsi:type="object">MageOS\NetSuiteConnector\Tax\Model\Order\Export\TaxManager\TaxItemLine\Proxy</item>
+            </argument>
+            <argument name="invoiceTaxManagers" xsi:type="array">
+                <item name="netsuite_processor"
+                      xsi:type="object">MageOS\NetSuiteConnector\Tax\Model\Invoice\Export\TaxManager\NetSuiteTaxProcessor\Proxy</item>
+                <item name="tax_item_line"
+                      xsi:type="object">MageOS\NetSuiteConnector\Tax\Model\Invoice\Export\TaxManager\TaxItemLine\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Tax\Plugin\OrderItemAddTax">
+        <arguments>
+            <argument name="productRepository"
+                      xsi:type="object">\Magento\Catalog\Api\ProductRepositoryInterface\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Order\Model\Mapper\Order">
+        <plugin sortOrder="1" name="add_tax_to_order" type="MageOS\NetSuiteConnector\Tax\Plugin\OrderAddTax"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Order\Model\Mapper\OrderExport\OrderItemList">
+        <plugin sortOrder="1" name="prepare_tax_for_order_item"
+                type="MageOS\NetSuiteConnector\Tax\Plugin\OrderItemAddTax"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Order\Model\Mapper\OrderExport\OrderItem">
+        <plugin sortOrder="1" name="add_tax_to_order_item" type="MageOS\NetSuiteConnector\Tax\Plugin\OrderItemAddTax"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Order\Model\Mapper\OrderExport\Shipment">
+        <plugin sortOrder="1" name="add_tax_to_order_shipment" type="MageOS\NetSuiteConnector\Tax\Plugin\OrderShipmentAddTax"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Invoice\Model\Mapper\ExportInvoice">
+        <plugin sortOrder="1" name="add_tax_to_invoice"
+                type="MageOS\NetSuiteConnector\Tax\Plugin\InvoiceAddTax"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Order\Model\Mapper\OrderExport\OrderItem">
+        <plugin name="add_discount_to_order_item"
+                type="MageOS\NetSuiteConnector\Discount\Plugin\OrderExport\OrderItemAddDiscount"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Order\Model\Mapper\Order">
+        <plugin name="add_discount_to_order"
+                type="MageOS\NetSuiteConnector\Discount\Plugin\OrderExport\OrderAddDiscount"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Invoice\Model\Mapper\ExportInvoice">
+        <plugin name="add_discount_to_invoice_item"
+                type="MageOS\NetSuiteConnector\Discount\Plugin\InvoiceExport\InvoiceItemAddDiscount"/>
+        <plugin name="add_discount_to_invoice"
+                type="MageOS\NetSuiteConnector\Discount\Plugin\InvoiceExport\InvoiceAddDiscount"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Invoice\Model\Mapper\ImportInvoice">
+        <plugin name="get_discount_from_cash_sale"
+                type="MageOS\NetSuiteConnector\Discount\Plugin\InvoiceImport\CashSaleGetDiscount"/>
+    </type>
+
+
+    <type name="MageOS\NetSuiteConnector\Discount\Model\Mapper\Invoice\Discount">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="line"
+                      xsi:type="object">MageOS\NetSuiteConnector\Discount\Model\Provider\Line\InvoiceDiscount\Proxy</item>
+                <item name="body"
+                      xsi:type="object">MageOS\NetSuiteConnector\Discount\Model\Provider\Body\InvoiceDiscount\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Discount\Model\Mapper\Order\Discount">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="line"
+                      xsi:type="object">MageOS\NetSuiteConnector\Discount\Model\Provider\Line\OrderDiscount\Proxy</item>
+                <item name="body"
+                      xsi:type="object">MageOS\NetSuiteConnector\Discount\Model\Provider\Body\OrderDiscount\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Sales\Api\InvoiceRepositoryInterface">
+        <plugin name="mageos_netsuite_invoice_before_save" type="MageOS\NetSuiteConnector\Invoice\Plugin\BeforeInvoiceRepositorySave"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="cashsale" xsi:type="object">MageOS\NetSuiteConnector\Invoice\Model\Process\Import\Cashsale\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ExportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="invoice_save" xsi:type="object">MageOS\NetSuiteConnector\Invoice\Model\Process\Export\InvoiceSave\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Plugin\AddViewInNetSuiteButtons">
+        <arguments>
+            <argument name="buttonProcessors" xsi:type="array">
+                <item name="invoice_view_button" xsi:type="object">\MageOS\NetSuiteConnector\Invoice\Block\Adminhtml\AddViewButton</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="InvoiceRequestBuilder" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\DefaultRequestBuilder">
+        <arguments>
+            <argument name="recordType" xsi:type="string">cashSale</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InvoiceImportProcessor" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\ImportProcessor">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">InvoiceRequestBuilder</argument>
+            <argument name="importProcessor" xsi:type="object">MageOS\NetSuiteConnector\Invoice\Model\Process\Import\Cashsale\Proxy</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InvoiceExportProcessor" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\ExportProcessor">
+        <arguments>
+            <argument name="exportModel" xsi:type="object">MageOS\NetSuiteConnector\Invoice\Model\Process\Export\InvoiceSave\Proxy</argument>
+        </arguments>
+    </virtualType>
+    <type name="MageOS\NetSuiteConnector\Core\Command\Util\ProcessRecord">
+        <arguments>
+            <argument name="cliProcessors" xsi:type="array">
+                <item name="invoice_import" xsi:type="object">InvoiceImportProcessor</item>
+                <item name="invoice_export" xsi:type="object">InvoiceExportProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="CashSaleImportRangeProcessor" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\DateRange\ImportProcessor">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\DateRange\RequestBuilder</argument>
+            <argument name="importProcessor" xsi:type="object">MageOS\NetSuiteConnector\Invoice\Model\Process\Import\Cashsale\Proxy</argument>
+        </arguments>
+    </virtualType>
+    <type name="MageOS\NetSuiteConnector\Core\Command\Util\ProcessRecordsByDateRange">
+        <arguments>
+            <argument name="cliProcessors" xsi:type="array">
+                <item name="cashsale" xsi:type="object">CashSaleImportRangeProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- PROCESSORS -->
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="cash_refund_import" xsi:type="object">MageOS\NetSuiteConnector\Refund\Model\Process\Import\CashRefund\Proxy</item>
+                <item name="credit_memo_import" xsi:type="object">MageOS\NetSuiteConnector\Refund\Model\Process\Import\CreditMemo\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Sales\Api\ShipmentRepositoryInterface">
+        <plugin name="mageos_netsuite_shipment_before_save" type="MageOS\NetSuiteConnector\Shipment\Plugin\BeforeShipmentRepositorySave"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="shipment" xsi:type="object">MageOS\NetSuiteConnector\Shipment\Model\Process\Import\Shipment\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Order\Model\Mapper\OrderExport\Shipment">
+        <plugin name="mageos_netsuite_shipping_id" type="MageOS\NetSuiteConnector\Shipment\Plugin\NetsuiteShippingMethodInternalId"/>
+    </type>
+    <virtualType name="ShipmentRequestBuilder" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\DefaultRequestBuilder">
+        <arguments>
+            <argument name="recordType" xsi:type="string">itemFulfillment</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="ShipmentImportProcessor" type="MageOS\NetSuiteConnector\Core\Model\Command\Utils\ProcessRecord\ImportProcessor">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">ShipmentRequestBuilder</argument>
+            <argument name="importProcessor" xsi:type="object">MageOS\NetSuiteConnector\Shipment\Model\Process\Import\Shipment\Proxy</argument>
+        </arguments>
+    </virtualType>
+    <type name="MageOS\NetSuiteConnector\Core\Command\Util\ProcessRecord">
+        <arguments>
+            <argument name="cliProcessors" xsi:type="array">
+                <item name="shipment_import" xsi:type="object">ShipmentImportProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="netsuiteupdatestocks" xsi:type="object">MageOS\NetSuiteConnector\Inventory\Command\Util\UpdateStocks</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Command\NetSuiteCron">
+        <arguments>
+            <argument name="possibleModes" xsi:type="array">
+                <item name="stock" xsi:type="string">stock</item>
+            </argument>
+        </arguments>
+        <plugin name="netsuite_cron_process_mode"
+                type="MageOS\NetSuiteConnector\Inventory\Plugin\NetSuiteCronPlugin"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Inventory\Command\Util\UpdateStocks">
+        <arguments>
+            <argument name="stockProcessor"
+                      xsi:type="object">MageOS\NetSuiteConnector\Inventory\Model\Process\Import\Stock\Proxy</argument>
+            <argument name="context" xsi:type="object">Magento\Framework\Model\Context\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Queue\Model\Queue\Handlers\PostProcessAggregator">
+        <arguments>
+            <argument name="postProcessHandlers" xsi:type="array">
+                <item name="compensate_reservation_on_export" xsi:type="object">MageOS\NetSuiteConnector\Inventory\Service\PostProcess\CompensateReservation</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogImportExport\Model\Indexer\Stock\Plugin\Import">
+        <plugin name="prevent_stock_index_marking"
+                type="MageOS\NetSuiteConnector\Inventory\Plugin\PreventMarkIndexInvalid"/>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Config\ConnectorConfig">
+        <plugin name="update_connector_stock_config_path_for_run_mode"
+                type="MageOS\NetSuiteConnector\Inventory\Plugin\ConnectorStockConfigPathForRunMode"/>
+    </type>
+    <type name="Magento\InventorySalesApi\Api\PlaceReservationsForSalesEventInterface">
+        <plugin name="disable_redundant_reservation"
+                type="MageOS\NetSuiteConnector\Inventory\Plugin\DisableReservation"/>
+    </type>
+    <preference for="MageOS\NetSuiteConnector\Inventory\Model\MagentoInventoryRepositoryInterface"
+                type="MageOS\NetSuiteConnector\Inventory\Model\InventoryRepositoryResolver"/>
+    <preference for="MageOS\NetSuiteConnector\Inventory\Model\NetSuiteInventoryRepository\StockDataTransformationInterface"
+                type="MageOS\NetSuiteConnector\Inventory\Model\NetSuiteInventoryRepository\StockDataTransformationResolver"/>
+    <preference for="MageOS\NetSuiteConnector\Shipment\Model\Mapper\ShipmentInterface"
+                type="MageOS\NetSuiteConnector\Shipment\Model\Mapper\ShipmentMapperResolver"/>
+    <type name="MageOS\NetSuiteConnector\Inventory\Model\InventoryRepositoryResolver">
+        <arguments>
+            <argument name="singleStockRepository" xsi:type="object">MageOS\NetSuiteConnector\Inventory\Single\Model\SingleStockRepository\Proxy</argument>
+            <argument name="multiStockRepository" xsi:type="object">MageOS\NetSuiteConnector\Inventory\Multi\Model\MultiStockRepository\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Inventory\Model\NetSuiteInventoryRepository\StockDataTransformationResolver">
+        <arguments>
+            <argument name="singleTransformation" xsi:type="object">MageOS\NetSuiteConnector\Inventory\Single\Model\NetSuiteInventoryRepository\StockDataTransformation\Proxy</argument>
+            <argument name="multiTransformation" xsi:type="object">MageOS\NetSuiteConnector\Inventory\Multi\Model\NetSuiteInventoryRepository\StockDataTransformation\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Shipment\Model\Mapper\ShipmentMapperResolver">
+        <arguments>
+            <argument name="singleSourceMapper" xsi:type="object">MageOS\NetSuiteConnector\Shipment\SingleSource\Model\Mapper\ShipmentSingleSource\Proxy</argument>
+            <argument name="multiSourceMapper" xsi:type="object">MageOS\NetSuiteConnector\Shipment\MultiSource\Model\Mapper\ShipmentMultiSource\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="location" xsi:type="object">MageOS\NetSuiteConnector\Inventory\Multi\Model\Process\Import\Location</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Command\NetSuiteCron">
+        <arguments>
+            <argument name="possibleModes" xsi:type="array">
+                <item name="location" xsi:type="string">location</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\NetSuiteConnector\Core\Command\NetSuiteCron">
+        <plugin name="location_mode_cron"
+                type="MageOS\NetSuiteConnector\Inventory\Multi\Plugin\NetSuiteCron"/>
+    </type>
+    <type name="\MageOS\NetSuiteConnector\Shipment\Model\Mapper\TrackingNumber">
+        <plugin name="tracking_numbers_building"
+                type="MageOS\NetSuiteConnector\Shipment\MultiSource\Plugin\TrackingNumberMultiSource"/>
+    </type>
+</config>

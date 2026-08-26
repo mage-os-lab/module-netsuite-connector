@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ruleset name="MageOS_NetSuiteConnector">
+    <description>Coding standard for MageOS_NetSuiteConnector.</description>
+
+    <file>.</file>
+
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/Test/*/_files/*</exclude-pattern>
+    <exclude-pattern>*/Test/*/_files_ns_response/*</exclude-pattern>
+
+    <arg name="extensions" value="php,phtml,xml"/>
+    <arg value="sp"/>
+
+    <rule ref="Magento2"/>
+</ruleset>

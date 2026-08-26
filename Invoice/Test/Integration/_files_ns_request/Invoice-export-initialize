@@ -1,0 +1,1 @@
+O:34:"NetSuite\Classes\InitializeRequest":1:{s:16:"initializeRecord";O:33:"NetSuite\Classes\InitializeRecord":4:{s:4:"type";s:8:"cashSale";s:9:"reference";O:30:"NetSuite\Classes\InitializeRef":4:{s:4:"type";s:10:"salesOrder";s:10:"internalId";s:1:"1";s:10:"externalId";N;s:4:"name";N;}s:12:"auxReference";N;s:13:"referenceList";N;}}

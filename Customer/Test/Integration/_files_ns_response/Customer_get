@@ -1,0 +1,27 @@
+<?php
+if (!isset($success)) {
+    throw new \Exception(sprintf('file %s missing $success', __FILE__));
+}
+
+
+$response = new \NetSuite\Classes\GetResponse();
+$response->readResponse = new \NetSuite\Classes\ReadResponse();
+$response->readResponse->status = new \NetSuite\Classes\Status();
+
+if ($success == 1) {
+    if (!isset($netsuiteId)) {
+        throw new \Exception(sprintf('file %s missing $netsuiteId', __FILE__));
+    }
+
+    $response->readResponse->status->isSuccess = true;
+    $response->readResponse->record = new \NetSuite\Classes\Customer();
+} elseif ($success == "dup") {
+    $response->readResponse->status->isSuccess = false;
+    $response->readResponse->status->statusDetail = [];
+    $response->readResponse->status->statusDetail[0] = new \NetSuite\Classes\StatusDetail();
+    $response->readResponse->status->statusDetail[0]->code = \NetSuite\Classes\StatusDetailCodeType::DUP_ENTITY;
+    $response->readResponse->status->statusDetail[0]->message = 'Duplicated entity!';
+}
+
+return $response;
+

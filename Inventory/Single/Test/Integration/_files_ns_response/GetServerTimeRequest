@@ -1,0 +1,9 @@
+<?php
+
+$serverTimeResponse = new \NetSuite\Classes\GetServerTimeResponse();
+$serverTimeResponse->getServerTimeResult = new \NetSuite\Classes\GetServerTimeResult();
+$serverTimeResponse->getServerTimeResult->status = new \NetSuite\Classes\Status();
+$serverTimeResponse->getServerTimeResult->status->isSuccess = true;
+$serverTimeResponse->getServerTimeResult->serverTime = "01/01/2020";
+
+return $serverTimeResponse;

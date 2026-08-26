@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * RocketWeb
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  RocketWeb
+ * @package   MageOS_NetSuiteConnector
+ * @copyright Copyright (c) 2026 RocketWeb (http://rocketweb.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Rocket Web Inc.
+ *
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <mageos_netsuite>
+            <general>
+                <enabled>1</enabled>
+                <nsendpoint>2024_2</nsendpoint>
+                <auth_type>token</auth_type>
+                <soap_request_timeout>180</soap_request_timeout>
+                <inventory_mode>single</inventory_mode>
+            </general>
+            <connection_import>
+                <same>1</same>
+            </connection_import>
+            <connection_export>
+                <same>1</same>
+            </connection_export>
+            <enable_disable_features>
+                <get_returns>1</get_returns>
+            </enable_disable_features>
+            <products>
+                <cache_seconds_for_lists_and_custom_records>3600</cache_seconds_for_lists_and_custom_records>
+            </products>
+            <queue_processing>
+                <export_batch_size>100</export_batch_size>
+                <import_batch_size>100</import_batch_size>
+                <timeout>100</timeout>
+                <updated_from_minutes>15</updated_from_minutes>
+                <delete_existing_items_in_import_queue>0</delete_existing_items_in_import_queue>
+                <delete_existing_items_in_import_queue_hours>1</delete_existing_items_in_import_queue_hours>
+            </queue_processing>
+            <developer>
+                <export_queue_threshold>100</export_queue_threshold>
+                <import_queue_threshold>100</import_queue_threshold>
+                <mail_errors>0</mail_errors>
+                <errorlog_lifetime>100</errorlog_lifetime>
+                <import_record_limit>300</import_record_limit>
+                <sender_email_identity>general</sender_email_identity>
+                <export_queue_threshold_email_template>mageos_netsuite_developer_export_queue_threshold_email_template</export_queue_threshold_email_template>
+                <import_queue_threshold_email_template>mageos_netsuite_developer_import_queue_threshold_email_template</import_queue_threshold_email_template>
+            </developer>
+            <monitor>
+                <lifetime>30</lifetime>
+            </monitor>
+        </mageos_netsuite>
+    </default>
+    <default>
+        <mageos_netsuite>
+            <enable_disable_features>
+                <get_products>1</get_products>
+            </enable_disable_features>
+            <products>
+                <import_special_price>0</import_special_price>
+                <default_visibility>4</default_visibility> <!--\Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH-->
+                <default_status>1</default_status><!--\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED-->
+                <default_tax_class_id>0</default_tax_class_id>
+                <default_website_ids>1</default_website_ids>
+                <default_store_ids>1</default_store_ids>
+                <default_attribute_set_id>4</default_attribute_set_id>
+                <tier_price_customer_group>32000</tier_price_customer_group> <!-- \Magento\Customer\Model\Group:CUST_GROUP_ALL -->
+                <cache_seconds_for_lists_and_custom_records>3600</cache_seconds_for_lists_and_custom_records>
+            </products>
+        </mageos_netsuite>
+    </default>
+    <default>
+        <mageos_netsuite>
+            <enable_disable_features>
+                <get_product_images>1</get_product_images>
+            </enable_disable_features>
+            <products>
+                <base_image_attribute_ns_id>custitem_item_zoom_image_1</base_image_attribute_ns_id>
+                <image_attribute_ns_ids>custitem_item_zoom_image_1,custitem_item_zoom_image_2,custitem_item_zoom_image_3,custitem_item_zoom_image_4</image_attribute_ns_ids>
+                <import_files_based_on_filename>1</import_files_based_on_filename>
+            </products>
+        </mageos_netsuite>
+    </default>
+    <default>
+        <mageos_netsuite>
+            <customers_import>
+                <default_telephone>000000000</default_telephone>
+                <magento_address_id_field>address_id</magento_address_id_field>
+            </customers_import>
+            <enable_disable_features>
+                <send_customers>1</send_customers>
+            </enable_disable_features>
+            <products>
+                <price_level_map>
+                    {"_1577106127149_149":{"customer_group":"1","price_level":"5"},"_1577106413465_465":{"customer_group":"2","price_level":"6"}}
+                </price_level_map>
+            </products>
+        </mageos_netsuite>
+    </default>
+    <default>
+        <mageos_netsuite>
+            <customers_import>
+                <default_address_phone>123456789</default_address_phone>
+                <default_address_city>City Not Set</default_address_city>
+                <default_address_street>Street Not Set</default_address_street>
+                <default_address_zip>12000</default_address_zip>
+                <default_address_country>US</default_address_country>
+                <default_store_id>1</default_store_id>
+                <login_message>1</login_message>
+                <registration_message>1</registration_message>
+            </customers_import>
+        </mageos_netsuite>
+    </default>
+    <default>
+        <mageos_netsuite>
+            <enable_disable_features>
+                <send_orders>1</send_orders>
+                <get_order_changes>1</get_order_changes>
+            </enable_disable_features>
+            <orders>
+                <default_order_status>_pendingFulfillment</default_order_status>
+            </orders>
+        </mageos_netsuite>
+    </default>
+    <default>
+        <mageos_netsuite>
+            <tax>
+                <tax_logic>tax_item_line</tax_logic>
+            </tax>
+        </mageos_netsuite>
+    </default>
+    <default>
+        <mageos_netsuite>
+            <enable_disable_features>
+                <get_shipments>1</get_shipments>
+            </enable_disable_features>
+            <shipping_methods>
+                <default_tracking_code_carrier>custom</default_tracking_code_carrier>
+                <send_tracking_information_on_import>1</send_tracking_information_on_import>
+            </shipping_methods>
+        </mageos_netsuite>
+    </default>
+    <default>
+        <mageos_netsuite>
+            <connection_stock>
+                <same>1</same>
+            </connection_stock>
+            <enable_disable_features>
+                <get_stock_updates>1</get_stock_updates>
+            </enable_disable_features>
+            <stock>
+                <qty_field_name>quantityOnHand</qty_field_name>
+                <qty_field_type>standard</qty_field_type>
+                <stock_stored_at_location_level>1</stock_stored_at_location_level>
+                <custom_search_page_size>500</custom_search_page_size>
+                <update_stocks_every_n_minutes>360</update_stocks_every_n_minutes>
+                <change_stock_status_under_zero>1</change_stock_status_under_zero>
+            </stock>
+            <developer>
+                <warn_if_stock_not_run_after>6</warn_if_stock_not_run_after>
+            </developer>
+        </mageos_netsuite>
+    </default>
+</config>

@@ -1,0 +1,13 @@
+<?php
+if (!isset($success)) {
+    throw new \Exception(sprintf('file %s missing $success', __FILE__));
+}
+$unsuccessful_response = null;
+$responses=[
+'response_1' => 'O:32:"NetSuite\Classes\GetListResponse":1:{s:16:"readResponseList";O:33:"NetSuite\Classes\ReadResponseList":2:{s:6:"status";O:23:"NetSuite\Classes\Status":2:{s:12:"statusDetail";N;s:9:"isSuccess";b:1;}s:12:"readResponse";a:1:{i:0;O:29:"NetSuite\Classes\ReadResponse":2:{s:6:"status";O:23:"NetSuite\Classes\Status":2:{s:12:"statusDetail";N;s:9:"isSuccess";b:1;}s:6:"record";O:27:"NetSuite\Classes\CustomList":12:{s:4:"name";s:11:"Demo Colors";s:5:"owner";O:26:"NetSuite\Classes\RecordRef":4:{s:10:"internalId";s:4:"7402";s:10:"externalId";N;s:4:"type";N;s:4:"name";s:13:"Gregor Pollak";}s:9:"isOrdered";b:1;s:11:"description";N;s:14:"isMatrixOption";b:0;s:8:"scriptId";s:27:"customlist_demos_color_list";s:21:"convertToCustomRecord";b:0;s:10:"isInactive";b:0;s:15:"customValueList";O:42:"NetSuite\Classes\CustomListCustomValueList":2:{s:11:"customValue";a:3:{i:0;O:38:"NetSuite\Classes\CustomListCustomValue":5:{s:5:"value";s:3:"Red";s:12:"abbreviation";s:1:"R";s:10:"isInactive";b:0;s:7:"valueId";i:1;s:22:"valueLanguageValueList";N;}i:1;O:38:"NetSuite\Classes\CustomListCustomValue":5:{s:5:"value";s:4:"Blue";s:12:"abbreviation";s:1:"B";s:10:"isInactive";b:0;s:7:"valueId";i:2;s:22:"valueLanguageValueList";N;}i:2;O:38:"NetSuite\Classes\CustomListCustomValue":5:{s:5:"value";s:6:"Yellow";s:12:"abbreviation";s:1:"Y";s:10:"isInactive";b:0;s:7:"valueId";i:3;s:22:"valueLanguageValueList";N;}}s:10:"replaceAll";b:1;}s:16:"translationsList";O:43:"NetSuite\Classes\CustomListTranslationsList":2:{s:12:"translations";a:1:{i:0;O:39:"NetSuite\Classes\CustomListTranslations":3:{s:6:"locale";s:13:"_frenchFrance";s:17:"localeDescription";s:15:"French (France)";s:4:"name";N;}}s:10:"replaceAll";b:1;}s:10:"internalId";s:3:"446";s:13:"nullFieldList";N;}}}}}'
+];
+$result = $unsuccessful_response;
+if ($success == 1 && isset($productQty)) {
+   $result = unserialize($responses['response_'.$productQty]);
+}
+return $result;

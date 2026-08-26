@@ -1,0 +1,690 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * RocketWeb
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  RocketWeb
+ * @package   MageOS_NetSuiteConnector
+ * @copyright Copyright (c) 2026 RocketWeb (http://rocketweb.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @author    Rocket Web Inc.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="mageos" translate="label" sortOrder="900">
+            <label>Mage-OS</label>
+        </tab>
+        <section id="mageos_netsuite" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>NetSuite</label>
+            <tab>mageos</tab>
+            <resource>MageOS_NetSuiteConnector::config_netsuite</resource>
+            <group id="general" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable integration</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="auth_type" translate="label" type="select" sortOrder="150"  showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Authentication type</label>
+                    <source_model>MageOS\NetSuiteConnector\Core\Model\Config\Source\AuthType</source_model>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="host" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>NetSuite Host</label>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="account_id" translate="label" type="text" sortOrder="350" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>NetSuite account id</label>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="consumer_key" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Consumer key</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="consumer_secret" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Consumer secret</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="token_id" translate="label" type="text" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Token Id</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="token_secret" translate="label" type="text" sortOrder="650" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Token secret</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="test_connection" translate="label" sortOrder="700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label></label>
+                    <button_label>Test Connection</button_label>
+                    <frontend_model>MageOS\NetSuiteConnector\Core\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="netsuite_base_url" translate="label" sortOrder="750" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>NetSuite Base url</label>
+                    <comment>The base url as you access it via the browser, e.g. https://system.na1.netsuite.com/</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="soap_request_timeout" sortOrder="800" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Soap Request timeout</label>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="inventory_mode" translate="label comment" type="select" sortOrder="850" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Inventory mode</label>
+                    <source_model>MageOS\NetSuiteConnector\Inventory\Model\Config\Source\InventoryMode</source_model>
+                    <comment>Single location maps NetSuite stock onto the default Magento source. Multiple locations maps each NetSuite location onto its own Magento source.</comment>
+                </field>
+            </group>
+            <group id="connection_import" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Import Connection Settings</label>
+                <field id="same" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Same as default connection?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="auth_type" translate="label" type="select" sortOrder="150"  showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Authentication type</label>
+                    <source_model>MageOS\NetSuiteConnector\Core\Model\Config\Source\AuthType</source_model>
+                    <depends><field id="same">0</field></depends>
+                </field>
+                <field id="consumer_key" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Consumer key</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="consumer_secret" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Consumer secret</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="token_id" translate="label" type="text" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Token Id</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="token_secret" translate="label" type="text" sortOrder="650" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Token secret</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="test_connection" translate="label" sortOrder="700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label></label>
+                    <button_label>Test Connection</button_label>
+                    <frontend_model>MageOS\NetSuiteConnector\Core\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                    <depends><field id="same">0</field></depends>
+                </field>
+            </group>
+            <group id="connection_export" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Export Connection Settings</label>
+                <field id="same" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Same as default connection?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="auth_type" translate="label" type="select" sortOrder="150"  showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Authentication type</label>
+                    <source_model>MageOS\NetSuiteConnector\Core\Model\Config\Source\AuthType</source_model>
+                    <depends><field id="same">0</field></depends>
+                </field>
+                <field id="consumer_key" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Consumer key</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="consumer_secret" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Consumer secret</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="token_id" translate="label" type="text" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Token Id</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="token_secret" translate="label" type="text" sortOrder="650" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Token secret</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">token</field>
+                    </depends>
+                </field>
+                <field id="test_connection" translate="label" sortOrder="700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label></label>
+                    <button_label>Test Connection</button_label>
+                    <frontend_model>MageOS\NetSuiteConnector\Core\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                    <depends><field id="same">0</field></depends>
+                </field>
+            </group>
+            <group id="enable_disable_features" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Enable/Disable Features</label>
+                <field id="get_products" translate="label" type="select" sortOrder="700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable getting product data from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="get_product_images" translate="label" type="select" sortOrder="750" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable getting product images from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+<label>Enable/Disable Features</label>
+                <field id="send_customers" translate="label" type="select" sortOrder="1100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable sending customers changes to NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="import_customers" translate="label" type="select" sortOrder="1111" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable getting customer data from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="send_orders" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable sending orders to NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="get_order_changes" translate="label" type="select" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable getting order changes from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="send_invoices" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable sending invoices NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="get_cash_sales" translate="label" type="select" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable getting cash sale/invoice data from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="get_credit_memo" translate="label" type="select" sortOrder="1200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable importing credit memos from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="get_cash_refund" translate="label" type="select" sortOrder="1201" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable importing cash refunds from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="get_shipments" translate="label" type="select" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable getting shipment data from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="get_stock_updates" translate="label" type="select" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable getting stock updates from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="import_location" translate="label" type="select" sortOrder="1119" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable getting locations from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="products" translate="label" type="text" sortOrder="800" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Product synchronization</label>
+                <field id="cache_seconds_for_lists_and_custom_records" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Cache lists and custom records for</label>
+                    <comment>Number of seconds</comment>
+                </field>
+<label>Product synchronization</label>
+                <field id="field_map" translate="label comment" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Field Mapping</label>
+                    <comment>Map Magento product attributes to NetSuite fields. For "standard" NetSuite fields, see the InventoryItem object in SuiteTalk documentation</comment>
+                    <frontend_model>MageOS\NetSuiteConnector\Product\Block\Adminhtml\System\Config\Form\Field\ProductFieldMap</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="price_level_netsuite_id" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Price level to grab the price from</label>
+                    <comment>The price levels are visble at Setup->Accounting->Accounting Lists, then switch to "Price level"</comment>
+                </field>
+                <field id="import_special_price"  showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="155">
+                    <label>Product Special Price Import Behavior</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\SpecialPrice</source_model>
+                    <comment>Make sure that Special Price Price level is set after enabling this setting.</comment>
+                </field>
+                <field id="special_price_price_level"  showInDefault="1" showInWebsite="1" showInStore="1" type="text" sortOrder="156">
+                    <label>Special Price Price level</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\Visibility</source_model>
+                    <depends><field id="import_special_price">1</field></depends>
+                    <comment>The price levels are visble at Setup->Accounting->Accounting Lists, then switch to "Price level"</comment>
+                </field>
+                <field id="default_visibility"  showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="200">
+                    <label>New product default visibility</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\Visibility</source_model>
+                </field>
+                <field id="default_status"  showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="300">
+                    <label>New product default status</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\Status</source_model>
+                </field>
+                <field id="default_tax_class_id" showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="400">
+                    <label>New product default tax class</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\TaxClass</source_model>
+                </field>
+                <field id="default_website_ids" showInDefault="1" showInWebsite="1" showInStore="1" type="multiselect" sortOrder="500">
+                    <label>Product default web site ids</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\Website</source_model>
+                </field>
+                <field id="default_store_ids" showInDefault="1" showInWebsite="1" showInStore="1" type="multiselect" sortOrder="600">
+                    <label>Product default store ids</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\Store</source_model>
+                </field>
+                <field id="default_attribute_set_id" showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="700">
+                    <label>New product default attribute set id</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\AttributeSet</source_model>
+                </field>
+                <field id="tier_price_customer_group" showInDefault="1" showInWebsite="0" showInStore="0" type="select" sortOrder="800">
+                    <label>Imported tier price customer group</label>
+                    <source_model>MageOS\NetSuiteConnector\Product\Model\Config\Source\TierCustomerGroup</source_model>
+                </field>
+                <field id="push_line_items_with_bundles" translate="label" type="select" sortOrder="1100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Push line items with fixed price bundles</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Note that if this is set to yes, it is possible that stock will be deduced twice for the line items - once for the bundle and once for the separate line items</comment>
+                </field>
+                <field id="related_products_field" translate="label" type="text" sortOrder="1200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Related Products Field Name</label>
+                    <comment>This field should contain comma-separated internal IDs of related products</comment>
+                </field>
+                <field id="upsells_field" translate="label" type="text" sortOrder="1300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Upsells Field Name</label>
+                    <comment>This field should contain comma-separated internal IDs of upsell products</comment>
+                </field>
+                <field id="html_tags" translate="label comment" sortOrder="1350" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Eav Attributes to Strip HTML Tags</label>
+                    <comment>For security purpose we can strip html tags for product Attributes on import from NS. If list of tags is empty - we strip all html tags.</comment>
+                    <frontend_model>MageOS\NetSuiteConnector\Product\Block\Adminhtml\System\Config\Form\Field\StripHtmlTagsMap</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="image_attribute_ns_ids" translate="label comment" type="text" sortOrder="1500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>NS attributes for images</label>
+                    <comment>This field should contain comma-separated internal IDs of the NS attributes for Images to be imported</comment>
+                </field>
+                <field id="base_image_attribute_ns_id" translate="label comment" type="text" sortOrder="1600" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>NS attributes for base image</label>
+                    <comment>Base image NS ID - it should be among IDs listed on the whole list of image IDs</comment>
+                </field>
+                <field id="import_files_based_on_filename" translate="label comment" type="select" sortOrder="1700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Compare image file name before import</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+<label>Product synchronization</label>
+                <field id="price_level_map" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="810">
+                    <label>Price Level Mapping</label>
+                    <frontend_model>MageOS\NetSuiteConnector\Customer\Block\Adminhtml\System\Config\Form\Field\PriceLevelMap</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>To see the defined Price Levels in NetSuite and their internal IDs, go to Setup->Accounting->Accounting Lists, then change type to "Price Level"</comment>
+                </field>
+            </group>
+            <group id="queue_processing" translate="label" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Queue processing settings</label>
+                <field id="export_batch_size" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Export message limit</label>
+                    <comment>The maximum number of messages that are to be exported (sent to) NetSuite in a single cron run</comment>
+                </field>
+                <field id="import_batch_size" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Import message limit</label>
+                    <comment>The maximum number of messages that are to be imported (processed from) NetSuite in a single cron run</comment>
+                </field>
+                <field id="timeout" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Timeout</label>
+                    <comment>In case processing an element fails, the element is added back to the queue. The timeout specifies the number of seconds that needs to pass so the item is considered for re-processing</comment>
+                </field>
+                <field id="updated_from_minutes" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Import items updated in last N minutes</label>
+                    <comment>The import queue will consider only items updated in at most this number of minutes</comment>
+                </field>
+                <field id="delete_existing_items_in_import_queue" translate="label" type="select" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Delete existing items in import queue</label>
+                    <comment>If this is set to Yes, then whenever an item is imported and it already exists in the queue, it get deleted and re-added. Useful in cases where items are frequently imported with incomplete information the first time</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="monitor" translate="label" type="text" sortOrder="9000" showInDefault="1" showInStore="0" showInWebsite="0">
+                <label>Monitoring</label>
+                <field id="remove_if_success" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Remove Monitoring Item if processed successfully</label>
+                    <comment>If this is set to Yes, then the Monitoring Dashboard will NOT include items that processed successfully.
+                    This should be enabled only for initial setup or debugging</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="debug_level" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Level of information to be saved</label>
+                    <source_model>MageOS\NetSuiteConnector\Core\Model\Monitor\Data\Source\OutputLevel</source_model>
+                </field>
+                <field id="lifetime" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Clean up Entries older then X days</label>
+                    <comment>0 means every day. Range 0-30. This includes all entries except "In Queue" ones.</comment>
+                    <validate>validate-digits validate-digits-range digits-range-0-30</validate>
+                </field>
+            </group>
+            <group id="developer" translate="label" type="text" sortOrder="10000" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Developer</label>
+                <field id="email" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Developer E-mail</label>
+                    <comment>Warning emails will be sent to this email address. You can add multuple addresses and separte them by comma.</comment>
+                </field>
+                <field id="sender_email_identity" translate="label" type="select" sortOrder="310" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="mail_errors" translate="label" type="select" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>E-mail errors and exceptions</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>E-mail will be sent to the configured developer email above.</comment>
+                </field>
+                <field id="export_queue_threshold" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Export queue threshold</label>
+                    <comment>If the export queue has more elements than defined here, an email is sent to the developer. An ever-growing queue is a sign of processing being stuck. Set to zero to disable.</comment>
+                </field>
+                <field id="import_queue_threshold" translate="label" type="text" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Import queue threshold</label>
+                    <comment>If the import queue has more elements than defined here, an email is sent to the developer. An ever-growing queue is a sign of processing being stuck. Set to zero to disable.</comment>
+                </field>
+                <field id="warn_if_import_not_run_after" translate="label" type="text" sortOrder="700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Warn if import not run after (hours)</label>
+                    <comment>If this is set, it shows a System Message in Admin if Import process hasn't ran for X hours. Value 0 disables it.</comment>
+                </field>
+                <field id="warn_if_export_not_run_after" translate="label" type="text" sortOrder="750" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Warn if export not run after (hours)</label>
+                    <comment>If this is set, it shows a System Message in Admin if Export process hasn't ran for X hours. Value 0 disables it.</comment>
+                </field>
+                <field id="warn_if_stock_not_run_after" translate="label" type="text" sortOrder="800" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Warn if stock not run after (hours)</label>
+                    <comment>If this is set, it shows a System Message in Admin if Stock process hasn't ran for X hours. Value 0 disables it.</comment>
+                </field>
+            </group>
+            <group id="customer" translate="label" type="text" sortOrder="1400" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Customer Settings</label>
+                <field id="magento_address_id_field" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Magento Address Id Field</label>
+                </field>
+            </group>
+
+            <group id="customers_import" translate="label" type="text" sortOrder="1500" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Customer Import Settings</label>
+                <field id="is_importable_field_id" showInDefault="1" showInWebsite="1" showInStore="1" type="text" sortOrder="100">
+                    <label>NetSuite Customer "Export to Magento" Field Id</label>
+                    <comment>NetSuite Customer Custom Field Id that marks Customer as importable to Magento</comment>
+                    <depends>
+                        <field id="mageos_netsuite/enable_disable_features/import_customers">1</field>
+                    </depends>
+                </field>
+                <field id="default_store_id" showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="100">
+                    <label>Default Store</label>
+                    <source_model>MageOS\NetSuiteConnector\CustomerImport\Model\Config\Source\Store</source_model>
+                    <comment>Customer Store scope when importing from NetSuite (add and update)</comment>
+                    <depends>
+                        <field id="mageos_netsuite/enable_disable_features/import_customers">1</field>
+                    </depends>
+                </field>
+                <field id="default_customer_group" showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="200">
+                    <label>Default Customer Group</label>
+                    <comment>Customer Group that is set when importing data from NetSuite (add and update)</comment>
+                    <source_model>MageOS\NetSuiteConnector\CustomerImport\Model\Config\Source\CustomerGroup</source_model>
+                    <depends>
+                        <field id="mageos_netsuite/enable_disable_features/import_customers">1</field>
+                    </depends>
+                </field>
+                <field id="required_address_fields" showInDefault="1" showInWebsite="1" showInStore="1" type="multiselect" sortOrder="300">
+                    <label>Required Address Fields</label>
+                    <comment>Select which fields must be set on NetSuite Customer Address for import. For missing
+                        fields, default values will be used, check module config.xml to see their values</comment>
+                    <source_model>MageOS\NetSuiteConnector\CustomerImport\Model\Config\Source\AddressFields</source_model>
+                    <depends>
+                        <field id="mageos_netsuite/enable_disable_features/import_customers">1</field>
+                    </depends>
+                </field>
+                <field id="login_message" showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="300">
+                    <label>Login Message</label>
+                    <comment>When Customer imported from NetSuite tries to Login, a custom message will be shown.
+                        The message template is located in our module and can be changed thru standard Magento practices.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="mageos_netsuite/enable_disable_features/import_customers">1</field>
+                    </depends>
+                </field>
+                <field id="registration_message" showInDefault="1" showInWebsite="1" showInStore="1" type="select" sortOrder="300">
+                    <label>Registration Message</label>
+                    <comment>When Customer imported from NetSuite tries to Register, a custom message will be shown.
+                        The message template is located in our module and can be changed thru standard Magento practices.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="mageos_netsuite/enable_disable_features/import_customers">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <group id="orders" translate="label" type="text" sortOrder="1100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Settings</label>
+                <field id="default_order_status" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Default order status</label>
+                    <source_model>MageOS\NetSuiteConnector\Order\Model\Config\Source\DefaultOrderStatus</source_model>
+                </field>
+                <field id="location_id" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Order Location Id</label>
+                    <comment>Location where the Sales Order Items are placed on Order Export. The list is available at Setup->Company->Locations in NetSuite. If not set - Location isn't added</comment>
+                </field>
+                <field id="custom_fields_mapping" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Custom fields that are to be synched between Magento and NetSuite</label>
+                    <comment>Define the fields in NetSuite at Setup->Customization->Transaction body fields. We only support the freetext type.</comment>
+                    <frontend_model>MageOS\NetSuiteConnector\Order\Block\Adminhtml\System\Config\Form\Field\OrderCustomFields</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="status_map" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Status Mapping</label>
+                    <frontend_model>MageOS\NetSuiteConnector\Order\Block\Adminhtml\System\Config\Form\Field\OrderStatusMap</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="discount_item_id" type="text" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Default discount item internal id</label>
+                    <comment>Create one at Lists->Accounting->Items</comment>
+                </field>
+                <field id="logic_switch" type="select" sortOrder="410" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Select Where to Export the Discount</label>
+                    <source_model>MageOS\NetSuiteConnector\Discount\Model\Config\Source\LogicSwitcher</source_model>
+                </field>
+                <field id="disable_order_level_discount" type="select" sortOrder="430" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Add Discount Per Item</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>For each Item, additional line with Discount will be added.</comment>
+                    <depends>
+                        <field id="mageos_netsuite/orders/logic_switch">line</field>
+                    </depends>
+                </field>
+                <field id="add_promotion_data" type="select" sortOrder="440" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Add Promotion Data for each Item</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>The connector discount support adds two custom columns on SalesOrder to ItemList which are used for better Discount
+                    reporting. If you want to use this, set to Yes.</comment>
+                </field>
+            </group>
+
+            <group id="payment_methods" translate="label" type="text" sortOrder="1300" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Payment Methods</label>
+                <field id="netsuite_mapping" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Mapping between Magento and NetSuite payment methods</label>
+                    <comment>To see the defined shipping methods in NetSuite and their internal IDs, go to Setup->Accounting->Accounting Lists, then change type to "Payment method"</comment>
+                    <frontend_model>MageOS\NetSuiteConnector\Order\Block\Adminhtml\System\Config\Form\Field\PaymentMap</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="processor_mapping" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Mapping between Magento payment methods and NetSuite payment processors</label>
+                    <comment>To see the defined credit card processors in NetSuite and their internal IDs, go to Setup->Accounting->Credit Card Processing</comment>
+                    <frontend_model>MageOS\NetSuiteConnector\Order\Block\Adminhtml\System\Config\Form\Field\PaymentProcessorMap</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+
+            <group id="tax" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Taxes</label>
+                <field id="tax_logic" translate="label" type="select" sortOrder="290"  showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Tax Handling Logic</label>
+                    <source_model>MageOS\NetSuiteConnector\Tax\Model\Config\Source\Tax</source_model>
+                </field>
+                <field id="not_taxable_internal_netsuite_id" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Not Taxable" code internal NetSuite id</label>
+                    <comment>The id can be found in NetSuite at Setup->Accounting->Tax Groups</comment>
+                    <depends><field id="tax_logic">tax_item_line</field></depends>
+                </field>
+                <field id="tax_item_internal_netsuite_id" type="text" sortOrder="310" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tax item internal NetSuite id</label>
+                    <comment>Tax will be passed as a separate line item to mitigate the need of configuring taxes both in Magento and NS. Create an item at Lists > Website > Items and add it's internal ID here</comment>
+                    <depends><field id="tax_logic">tax_item_line</field></depends>
+                </field>
+                <field id="sales_order_tax_amount_id" type="text" sortOrder="320" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sales Order Field to add Tax Amount for order</label>
+                    <comment>The Field should be created in Customization menu of NetSuite.</comment>
+                    <depends><field id="tax_logic">netsuite_processor</field></depends>
+                </field>
+                <field id="sales_order_total_amount_id" type="text" sortOrder="330" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sales Order Field to add Total Amount for order</label>
+                    <comment>The Field should be created in Customization menu of NetSuite.</comment>
+                    <depends><field id="tax_logic">netsuite_processor</field></depends>
+                </field>
+<!--                skipped for now-->
+
+<!--                <field id="netsuite_shipping_tax_id" type="text" sortOrder="330" showInDefault="1" showInWebsite="0" showInStore="0">-->
+<!--                    <label>NetSuite Shipping Tax Code/Group ID</label>-->
+<!--                    <comment>The id can be found in NetSuite at Setup->Accounting->Tax Groups</comment>-->
+<!--                    <depends><field id="tax_logic">netsuite_processor</field></depends>-->
+<!--                </field>-->
+            </group>
+
+            <group id="shipping_methods" translate="label" type="text" sortOrder="1200" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Shipping Methods</label>
+                <field id="netsuite_mapping" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Mapping between Magento and NetSuite shipping methods</label>
+                    <frontend_model>MageOS\NetSuiteConnector\Shipment\Block\Adminhtml\System\Config\Form\Field\ShippingMap</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>To see the defined shipping methods in NetSuite and their internal IDs, go to Lists->Accounting->Shipping Items</comment>
+                </field>
+                <field id="netsuite_default_shipping_id" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>If none of the rules above match, use this NetSuite shipping item internal id:</label>
+                    <comment>To see the defined shipping methods in NetSuite and their internal IDs, go to Lists->Accounting->Shipping Items</comment>
+                </field>
+                <field id="default_tracking_code_carrier" translate="label" type="select" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Default tracking number carrier</label>
+                    <source_model>MageOS\NetSuiteConnector\Shipment\Model\Config\Source\TrackingType</source_model>
+                </field>
+                <field id="tracking_mapping"  sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Mapping between Magento Tracking number types and Netsuite shipping methods</label>
+                    <comment>To see the defined shipping methods in Netsuite and their internal IDs, go to Lists->Accounting->Shipping Items</comment>
+                    <frontend_model>MageOS\NetSuiteConnector\Shipment\Block\Adminhtml\System\Config\Form\Field\TrackingMap</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="send_tracking_information_on_import" type="select" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Send tracking information when receiving tracking numbers from NetSuite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="connection_stock" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Stock Connection Settings</label>
+                <field id="same" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Same as default connection?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="auth_type" translate="label" type="select" sortOrder="150"  showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Authentication type</label>
+                    <source_model>MageOS\NetSuiteConnector\Core\Model\Config\Source\AuthType</source_model>
+                    <depends><field id="same">0</field></depends>
+                </field>
+                <field id="consumer_key" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Consumer key</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">0</field>
+                    </depends>
+                </field>
+                <field id="consumer_secret" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Consumer secret</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">0</field>
+                    </depends>
+                </field>
+                <field id="token_id" translate="label" type="text" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Token Id</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">0</field>
+                    </depends>
+                </field>
+                <field id="token_secret" translate="label" type="text" sortOrder="650" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Token secret</label>
+                    <depends>
+                        <field id="same">0</field>
+                        <field id="auth_type">0</field>
+                    </depends>
+                </field>
+                <field id="test_connection" translate="label" sortOrder="700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label></label>
+                    <button_label>Test Connection</button_label>
+                    <frontend_model>MageOS\NetSuiteConnector\Core\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                    <depends><field id="same">0</field></depends>
+                </field>
+            </group>
+
+            <group id="stock" translate="label" type="text" sortOrder="900" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Stock options</label>
+                <field id="stock_location" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Location Internal Id</label>
+                    <comment>This config is ignored for Inventory Multi Management NSC setup</comment>
+                </field>
+                <field id="stock_stored_at_location_level" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Stock stored at location level?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Set this to no if stock is stored in a custom field at product level. Set it to yes if it is stored in a custom or standard field at location level. This config is ignored for Inventory Multi Management NSC setup</comment>
+                </field>
+                <field id="qty_field_name" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Quantity field name</label>
+                    <comment>Used when grabbing stock data from the saved search (on stock updates)</comment>
+                </field>
+                <field id="qty_field_type" translate="label" type="select" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Quantity field type</label>
+                    <source_model>MageOS\NetSuiteConnector\Inventory\Model\Config\Source\FieldType</source_model>
+                    <depends><field id="stock_stored_at_location_level">1</field></depends>
+                </field>
+                <field id="update_stocks_every_n_minutes" type="text" sortOrder="600"  showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Update the stocks every N minutes</label>
+                </field>
+                <field id="custom_search_id" sortOrder="700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Saved stock search internal id</label>
+                    <comment>A custom search must be defined to allow stock updates. This has a very specific format. Refer to the documentation on how to create one.</comment>
+                </field>
+                <field id="custom_search_page_size" sortOrder="800" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Page size for the saved search query</label>
+                </field>
+                <field type="select" id="change_stock_status_under_zero" sortOrder="900" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Change stock status when under zero items</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Whether to set the stock status to "Out of stock" when reaching zero, or not set this option at all</comment>
+                </field>
+            </group>
+
+        </section>
+    </system>
+</config>

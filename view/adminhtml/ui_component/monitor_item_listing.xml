@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">monitor_item_listing.monitor_item_listing_data_source</item>
+            <item name="deps" xsi:type="string">monitor_item_listing.monitor_item_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">monitor_item_columns</item>
+    </argument>
+    <dataSource name="monitor_item_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\ListingDataProvider</argument>
+            <argument name="name" xsi:type="string">monitor_item_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">monitor_id</argument>
+            <argument name="requestFieldName" xsi:type="string">monitor_id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">monitor_id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="templates" xsi:type="array">
+                        <item name="filters" xsi:type="array">
+                            <item name="select" xsi:type="array">
+                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</item>
+                                <item name="template" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </filters>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="monitor_item_columns">
+        <column name="process" class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Listing\Columns\Process" sortOrder="10">
+            <settings>
+                <filter>select</filter>
+                <options class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Listing\Columns\Process"/>
+                <dataType>select</dataType>
+                <label translate="true">Process</label>
+            </settings>
+        </column>
+        <column name="entity" class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Listing\Columns\Entity" sortOrder="20">
+            <settings>
+                <filter>select</filter>
+                <options class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Listing\Columns\Entity"/>
+                <label translate="true">Entity</label>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="item_id" class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Listing\Columns\EntityId" sortOrder="30">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Entity ID</label>
+                <dataType>number</dataType>
+                <resizeDefaultWidth>25</resizeDefaultWidth>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="40">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Created</label>
+            </settings>
+        </column>
+        <column name="processed_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="MageOS_NetSuiteConnector/js/grid/columns/date" sortOrder="50">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Processed</label>
+            </settings>
+        </column>
+        <column name="counter" sortOrder="60">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Retried</label>
+                <dataType>number</dataType>
+                <resizeDefaultWidth>25</resizeDefaultWidth>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <column name="status" class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Listing\Columns\Status" sortOrder="70">
+            <settings>
+                <filter>select</filter>
+                <options class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Listing\Columns\Status"/>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+                <dataScope>status</dataScope>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Listing\Columns\Actions" sortOrder="200">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="resizeEnabled" xsi:type="boolean">false</item>
+                    <item name="resizeDefaultWidth" xsi:type="string">107</item>
+                    <item name="indexField" xsi:type="string">monitor_id</item>
+                </item>
+            </argument>
+        </actionsColumn>
+    </columns>
+</listing>

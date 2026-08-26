@@ -1,0 +1,5 @@
+<?php
+
+const TAX_CLASS_ID = 3;
+const ONLINE_PRICE_LEVEL = 5;
+const WHOLESALE_PRICE_LEVEL = 6;

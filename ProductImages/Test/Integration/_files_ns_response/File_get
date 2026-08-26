@@ -1,0 +1,23 @@
+<?php
+if (!isset($success)) {
+    throw new \Exception(sprintf('file %s missing $success', __FILE__));
+}
+
+$response = new \NetSuite\Classes\GetResponse();
+$response->readResponse = new \NetSuite\Classes\ReadResponse();
+$response->readResponse->status = new \NetSuite\Classes\Status();
+
+if ($success == 1) {
+    $response->readResponse->status->isSuccess = true;
+    $response->readResponse->record = new \NetSuite\Classes\File();
+    if ($this->parameters['has_files'] && count($this->parameters['files'])) {
+        $file = array_shift($this->parameters['files']);
+        $response->readResponse->record->name = $file['file_name'];
+        $response->readResponse->record->content = $file['file_content'];
+    }
+} else {
+    $response->readResponse->status->isSuccess = false;
+    $response->readResponse->status->statusDetail = [];
+}
+
+return $response;

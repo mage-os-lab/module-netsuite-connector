@@ -1,0 +1,9 @@
+<?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: stan
+ * Date: 20/11/2017
+ * Time: 17:28
+ */
+
+require __DIR__ . '/default_rollback.php';

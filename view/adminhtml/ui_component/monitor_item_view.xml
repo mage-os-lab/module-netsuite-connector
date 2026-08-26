@@ -1,0 +1,199 @@
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">monitor_item_view.item_form_data_source</item>
+            <item name="deps" xsi:type="string">monitor_item_view.item_form_data_source</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <label>Monitor Item</label>
+        <dataScope>data</dataScope>
+        <namespace>monitor_item_view</namespace>
+        <buttons>
+            <button name="save_and_continue" class="MageOS\NetSuiteConnector\Core\Ui\Component\Monitor\Button\SaveAndContinueButton"/>
+            <button name="save" class="MageOS\NetSuiteConnector\Core\Ui\Component\Monitor\Button\SaveButton"/>
+            <button name="cancel" class="MageOS\NetSuiteConnector\Core\Ui\Component\Monitor\Button\CancelButton"/>
+            <button name="execute" class="MageOS\NetSuiteConnector\Core\Ui\Component\Monitor\Button\ExecuteButton"/>
+            <button name="back">
+                <url path="*/*/"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+        </buttons>
+    </settings>
+    <dataSource name="item_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="*/*/save"/>
+        </settings>
+        <dataProvider class="MageOS\NetSuiteConnector\Core\Ui\DataProvider\Monitor\Form\FormDataProvider" name="item_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>monitor_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+            <label>General Information</label>
+            <dataScope>general</dataScope>
+        </settings>
+        <field name="monitor_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>monitor_id</dataScope>
+            </settings>
+        </field>
+        <field name="process" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Process</label>
+                <dataScope>process</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+            </settings>
+        </field>
+        <field name="entity" formElement="input">
+            <settings>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <dataType>text</dataType>
+                <dataScope>entity</dataScope>
+                <label translate="true">Entity</label>
+            </settings>
+        </field>
+        <field name="item_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>item_id</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label translate="true">Entity ID</label>
+            </settings>
+        </field>
+        <field name="created_at" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>created_at</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label translate="true">Created</label>
+            </settings>
+        </field>
+        <field name="processed_at" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>processed_at</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label translate="true">Processed</label>
+            </settings>
+        </field>
+        <field name="status" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>status</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label translate="true">Status</label>
+            </settings>
+        </field>
+        <field name="last_error" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>last_error</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label translate="true">Current Output</label>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="information">
+        <settings>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+            <label>Process Information</label>
+            <dataScope>general</dataScope>
+        </settings>
+        <field name="debug_level" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>debug_level</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label translate="true">Output Level</label>
+                <tooltip>
+                    <description translate="true">You can set the Output Level in the Store Configuration under
+                        Mage-OS > NetSuite. Debug level shows all log informations.</description>
+                </tooltip>
+            </settings>
+        </field>
+        <field name="process_output" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>process_output</dataScope>
+                <elementTmpl>ui/form/element/html</elementTmpl>
+                <label translate="true">Process Output</label>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="payload">
+        <settings>
+            <dataScope>general</dataScope>
+            <collapsible>true</collapsible>
+            <opened>false</opened>
+            <label>Item Data</label>
+        </settings>
+        <field name="overwrite_payload" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <dataScope>overwrite_payload</dataScope>
+                <label translate="true">Overwrite the Data</label>
+                <tooltip>
+                    <description translate="true">If this is set, this data will be used on next request</description>
+                </tooltip>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="boolean">false</map>
+                            <map name="true" xsi:type="boolean">true</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="payload_instance" formElement="input">
+            <settings>
+                <dataScope>payload_instance</dataScope>
+                <dataType>text</dataType>
+                <label>Instance</label>
+                <disabled>true</disabled>
+                <tooltip>
+                    <description>For more information on data structure, click here.</description>
+                    <link>https://www.netsuite.com/help/helpcenter/en_US/srbrowser/Browser2020_1/schema/record/account.html</link>
+                </tooltip>
+            </settings>
+        </field>
+        <field name="payload" formElement="textarea">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="rows" xsi:type="number">25</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>payload</dataScope>
+                <label translate="true">Data</label>
+                <dataType>textarea</dataType>
+            </settings>
+        </field>
+    </fieldset>
+</form>

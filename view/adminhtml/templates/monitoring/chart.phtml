@@ -1,0 +1,234 @@
+<style type="text/css">
+
+    svg {
+        font-size: 10px;
+    }
+
+    .axis {
+        shape-rendering: crispEdges;
+    }
+
+    .axis path, .axis line {
+        fill: none;
+        stroke-width: .5px;
+    }
+
+    .x.axis path {
+        stroke: #000;
+    }
+
+    .x.axis line {
+        stroke: #fff;
+        stroke-opacity: .5;
+    }
+
+    .y.axis line {
+        stroke: #ddd;
+    }
+
+    path.line {
+        fill: none;
+        stroke: #000;
+        stroke-width: .5px;
+    }
+
+    rect.pane {
+        cursor: move;
+        fill: none;
+        pointer-events: all;
+    }
+
+    .chart {
+        width: 800px;
+        height: 200px;
+    }
+
+    .overlay {
+        fill: none;
+        pointer-events: all;
+    }
+
+</style>
+
+<div style="text-align: right">
+    <label>Period</label>
+    <select id="period" class="admin__control-select">
+        <option value="today">Today</option>
+        <option value="30days">Last 30 Days</option>
+    </select>
+</div>
+
+<h3><?= /* @noEscape */ __('Number of exported records:'); ?></h3>
+<svg id="exported" class="chart" width="800" height="200"></svg>
+
+<h3><?= /* @noEscape */ __('Number of created records:'); ?></h3>
+<svg id="created" class="chart" width="800" height="200"></svg>
+
+<h3><?= /* @noEscape */ __('Number of imported records:'); ?></h3>
+<svg id="imported" class="chart" width="800" height="200"></svg>
+
+<h3><?= /* @noEscape */ __('NetSuite response times:'); ?></h3>
+<svg id="response_times" class="chart" width="800" height="200"></svg>
+
+<script>
+    var ajaxUrl = '<?= /* @noEscape */ $block->getAjaxUrl(); ?>';
+    requirejs(
+        [
+            'jquery',
+            'MageOS_NetSuiteConnector/js/d3.v4.min'
+        ],
+        function($, d3) {
+            var periodSelector = '#period';
+
+            var queryOptions = {
+                period: 'today'
+            };
+
+            function drawChart(dom, data, options) {
+                d3.selectAll(dom + " > *").remove();
+
+                var svg = d3.select(dom),
+                    margin = {top: 20, right: 20, bottom: 30, left: 50},
+                    width = +svg.attr("width") - margin.left - margin.right,
+                    height = +svg.attr("height") - margin.top - margin.bottom,
+                    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                var x = d3.scaleTime()
+                    .rangeRound([0, width]);
+
+                var y = d3.scaleLinear()
+                    .rangeRound([height, 0]);
+
+                var line = d3.line()
+                    .x(function(d) { return x(d.date); })
+                    .y(function(d) { return y(d.value); });
+
+                var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+                //x.domain(d3.extent(data, function(d) { return d.date; }));
+                if(data.length === 0) {
+                    return;
+                }
+                x.domain([data[0].date, data[data.length - 1].date]);
+                y.domain(d3.extent(data, function(d) { return d.value; }));
+
+                g.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(x))
+                    .select(".domain")
+                    .remove();
+
+                g.append("g")
+                    .call(d3.axisLeft(y))
+                    .append("text")
+                    .attr("fill", "#000")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", "0.71em")
+                    .attr("text-anchor", "end")
+                    .text(options.units);
+
+                g.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", line);
+
+                var focus = g.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("circle")
+                    .attr("r", 4.5);
+
+                focus.append("text")
+                    .attr("x", 9)
+                    .attr("dy", ".35em");
+                
+                g.append("rect")
+                    .attr("class", "overlay")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                function mousemove() {
+                    var x0 = x.invert(d3.mouse(this)[0]),
+                        i = bisectDate(data, x0, 1);
+                    if(i) {
+                        var d0 = data[i - 1],
+                            d1 = data[i],
+                            d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                        focus.attr("transform", "translate(" + x(d.date) + "," + y(d.value) + ")");
+                        var value = Math.round(d.value * 1000) / 1000;
+                        focus.select("text").text(value + ' (' + d.date + ')');
+                    }
+                }
+            }
+
+            function loadChart(element, query) {
+                $.get(ajaxUrl, query, function (data) {
+                    var chartOptions = {
+                        units: query.units
+                    };
+
+                    var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+
+                    data = data.map(function (entry) {
+                        entry.date = parseTime(entry.date);
+                        entry.value = parseFloat(entry.value);
+                        return entry;
+                    });
+                    
+                    data.sort(function(a, b) {
+                        return a.date - b.date;
+                    });
+
+                    var records = data;
+                    records.columns = ['date', 'value'];
+
+                    drawChart(element, records, chartOptions);
+                });
+            }
+
+            function refreshCharts() {
+                loadChart('#exported', {
+                    type: 'exported',
+                    period: queryOptions.period,
+                    units: 'records'
+                });
+                loadChart('#created', {
+                    type: 'created',
+                    period: queryOptions.period,
+                    units: 'records'
+                });
+                loadChart('#imported', {
+                    type: 'imported',
+                    period: queryOptions.period,
+                    units: 'records'
+                });
+                loadChart('#response_times', {
+                    type: 'response_times',
+                    period: queryOptions.period,
+                    units: 'sec'
+                });
+            }
+
+            refreshCharts();
+
+            $(periodSelector).change(function() {
+                var newPeriod = $(this).val();
+
+                queryOptions.period = newPeriod;
+
+                refreshCharts();
+            })
+
+    });
+
+
+</script>

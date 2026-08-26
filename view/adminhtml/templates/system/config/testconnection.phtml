@@ -1,0 +1,59 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+$prefix = $block->getData('prefix');
+?>
+
+<script>
+    require(['prototype'], function(){
+
+//<![CDATA[
+        function <?php echo $prefix?>validateConnection() {
+            var validationMessage = $('<?php echo $prefix?>validation_result');
+                var params = {
+                    host: $('mageos_netsuite_general_host').value,
+                    account_id: $('mageos_netsuite_general_account_id').value,
+                    consumer_key: $('<?php echo $prefix?>_consumer_key').value,
+                    consumer_secret: $('<?php echo $prefix?>_consumer_secret').value,
+                    token_id: $('<?php echo $prefix?>_token_id').value,
+                    token_secret: $('<?php echo $prefix?>_token_secret').value
+                };
+            new Ajax.Request('<?php /* @escapeNotVerified */ echo $block->getAjaxUrl() ?>', {
+                parameters: params,
+                onSuccess: function(response) {
+                    var result = '<?php /* @escapeNotVerified */ echo __('Error connecting to NetSuite.') ?>';
+                    try {
+                        if (response.responseText.isJSON()) {
+                            response = response.responseText.evalJSON();
+                            result = response.message;
+                            if(!result) result = 'Connection successful!';
+                        }
+                        if (response.valid == 1) {
+                            validationMessage.removeClassName('hidden').addClassName('success')
+                        } else {
+                            validationMessage.removeClassName('hidden').addClassName('error')
+                        }
+                    } catch (e) {
+                        validationMessage.removeClassName('hidden').addClassName('error')
+                    }
+                    validationMessage.update(result);
+                }
+            });
+        }
+
+        window.<?php echo $prefix?>validateConnection = <?php echo $prefix?>validateConnection;
+//]]>
+
+    });
+</script>
+<div class="actions actions-validate-connection">
+    <div id="<?php echo $prefix?>validation_result" class="message-validation hidden"></div>
+    <button onclick="javascript:<?php echo $prefix?>validateConnection(); return false;" class="action-validate-connection" type="button" id="<?php echo $block->getHtmlId() ?>">
+        <span><?php echo $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+</div>

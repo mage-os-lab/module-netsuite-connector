@@ -1,0 +1,65 @@
+<?php
+
+$searchResponse = new \NetSuite\Classes\SearchResponse();
+$searchResponse->searchResult = new \NetSuite\Classes\SearchResult();
+$searchResponse->searchResult->status = new \NetSuite\Classes\Status();
+$searchResponse->searchResult->status->isSuccess = $success;
+$searchResponse->searchResult->searchRowList = new \NetSuite\Classes\SearchRowList();
+
+$rows = [];
+
+if (!isset($record)) {
+    for ($i = 1; $i <= 2; $i++) {
+        $row = new \NetSuite\Classes\ItemSearchRow();
+        $row->basic = new \NetSuite\Classes\ItemSearchRowBasic();
+        $internalId = new \NetSuite\Classes\SearchColumnSelectField();
+        $internalId->searchValue = new \NetSuite\Classes\RecordRef();
+        $internalId->searchValue->internalId = '1';
+        $row->basic->internalId = [$internalId];
+        $row->basic->quantityOnHand = [];
+        $row->basic->quantityOnHand[0] = new \NetSuite\Classes\SearchColumnDoubleField();
+        $searchValue = 10.0;
+        $sourceInternalId = '1';
+        if ($i === 2) {
+            $searchValue = 20.0;
+            $sourceInternalId = '2';
+        }
+        $row->basic->quantityOnHand[0]->searchValue = $searchValue;
+        $inventoryLocationJoin = new \NetSuite\Classes\LocationSearchRowBasic();
+        $internalLocationId = new \NetSuite\Classes\SearchColumnSelectField();
+        $internalLocationId->searchValue = new \NetSuite\Classes\RecordRef();
+        $internalLocationId->searchValue->internalId = $sourceInternalId;
+        $inventoryLocationJoin->internalId = [$internalLocationId];
+        $row->inventoryLocationJoin = $inventoryLocationJoin;
+        $rows[] = $row;
+    }
+}
+
+if (!empty($record) && $record === 'decrease_qty') {
+    for ($i = 1; $i <= 2; $i++) {
+        $row = new \NetSuite\Classes\ItemSearchRow();
+        $row->basic = new \NetSuite\Classes\ItemSearchRowBasic();
+        $internalId = new \NetSuite\Classes\SearchColumnSelectField();
+        $internalId->searchValue = new \NetSuite\Classes\RecordRef();
+        $internalId->searchValue->internalId = '1';
+        $row->basic->internalId = [$internalId];
+        $row->basic->quantityOnHand = [];
+        $row->basic->quantityOnHand[0] = new \NetSuite\Classes\SearchColumnDoubleField();
+        $searchValue = 0.0;
+        $sourceInternalId = '1';
+        if ($i === 2) {
+            $sourceInternalId = '2';
+        }
+        $row->basic->quantityOnHand[0]->searchValue = $searchValue;
+        $inventoryLocationJoin = new \NetSuite\Classes\LocationSearchRowBasic();
+        $internalLocationId = new \NetSuite\Classes\SearchColumnSelectField();
+        $internalLocationId->searchValue = new \NetSuite\Classes\RecordRef();
+        $internalLocationId->searchValue->internalId = $sourceInternalId;
+        $inventoryLocationJoin->internalId = [$internalLocationId];
+        $row->inventoryLocationJoin = $inventoryLocationJoin;
+        $rows[] = $row;
+    }
+}
+
+$searchResponse->searchResult->searchRowList->searchRow = $rows;
+return $searchResponse;

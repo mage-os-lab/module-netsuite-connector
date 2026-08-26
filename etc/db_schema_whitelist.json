@@ -1,0 +1,118 @@
+{
+    "mageos_netsuite_message": {
+        "column": {
+            "message_id": true,
+            "queue": true,
+            "body": true,
+            "item_id": true,
+            "action": true,
+            "number_of_trials": true,
+            "picked_at": true,
+            "status": true,
+            "priority": true,
+            "updated_at": true
+        },
+        "index": {
+            "MAGEOS_NETSUITE_MESSAGE_STATUS_UPDATED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MAGEOS_NETSUITE_MESSAGE_QUEUE_MESSAGE_ID": true
+        }
+    },
+    "mageos_netsuite_monitor": {
+        "column": {
+            "monitor_id": true,
+            "message_id": true,
+            "process": true,
+            "entity": true,
+            "item_id": true,
+            "created_at": true,
+            "processed_at": true,
+            "status": true,
+            "counter": true,
+            "has_payload": true,
+            "payload": true,
+            "payload_instance": true,
+            "overwrite_payload": true,
+            "process_output": true
+        },
+        "index": {
+            "MAGEOS_NETSUITE_MONITOR_MESSAGE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "mageos_netsuite_bundle_product_link": {
+        "column": {
+            "link_id": true,
+            "product_id": true,
+            "netsuite_internal_id": true,
+            "option_sku": true
+        },
+        "index": {
+            "MAGEOS_NETSUITE_BUNDLE_PRODUCT_LINK_PRODUCT_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MAGEOS_NETSUITE_BNDL_PRD_LNK_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true
+        }
+    },
+    "mageos_netsuite_customer_group": {
+        "column": {
+            "customer_group_id": true,
+            "netsuite_internal_id": true
+        },
+        "index": {
+            "MAGEOS_NETSUITE_CUSTOMER_GROUP_NETSUITE_INTERNAL_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "netsuite_internal_id": true,
+            "netsuite_last_import_date": true
+        },
+        "index": {
+            "SALES_ORDER_NETSUITE_INTERNAL_ID": true
+        }
+    },
+    "sales_invoice": {
+        "column": {
+            "netsuite_internal_id": true,
+            "netsuite_last_import_date": true
+        },
+        "index": {
+            "SALES_INVOICE_NETSUITE_INTERNAL_ID": true
+        }
+    },
+    "sales_creditmemo": {
+        "column": {
+            "netsuite_internal_id": true,
+            "netsuite_last_import_date": true
+        },
+        "index": {
+            "SALES_CREDITMEMO_NETSUITE_INTERNAL_ID": true
+        }
+    },
+    "sales_shipment": {
+        "column": {
+            "netsuite_internal_id": true,
+            "netsuite_last_import_date": true
+        },
+        "index": {
+            "SALES_SHIPMENT_NETSUITE_INTERNAL_ID": true
+        }
+    },
+    "inventory_source": {
+        "column": {
+            "netsuite_internal_id": true
+        },
+        "index": {
+            "INVENTORY_SOURCE_NETSUITE_INTERNAL_ID": true
+        }
+    }
+}
