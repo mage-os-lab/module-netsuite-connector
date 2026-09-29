@@ -33,7 +33,7 @@ class TestConnection extends \Magento\Config\Block\System\Config\Form\Field
     {
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
-            $this->setTemplate('system/config/testconnection.phtml');
+            $this->setTemplate('MageOS_NetSuiteConnector::system/config/testconnection.phtml');
         }
         return $this;
     }

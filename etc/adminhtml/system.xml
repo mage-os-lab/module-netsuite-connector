@@ -203,7 +203,6 @@
                     <label>Enable getting product images from NetSuite</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-<label>Enable/Disable Features</label>
                 <field id="send_customers" translate="label" type="select" sortOrder="1100" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Enable sending customers changes to NetSuite</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -255,7 +254,6 @@
                     <label>Cache lists and custom records for</label>
                     <comment>Number of seconds</comment>
                 </field>
-<label>Product synchronization</label>
                 <field id="field_map" translate="label comment" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Field Mapping</label>
                     <comment>Map Magento product attributes to NetSuite fields. For "standard" NetSuite fields, see the InventoryItem object in SuiteTalk documentation</comment>
@@ -336,7 +334,6 @@
                     <label>Compare image file name before import</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-<label>Product synchronization</label>
                 <field id="price_level_map" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="810">
                     <label>Price Level Mapping</label>
                     <frontend_model>MageOS\NetSuiteConnector\Customer\Block\Adminhtml\System\Config\Form\Field\PriceLevelMap</frontend_model>

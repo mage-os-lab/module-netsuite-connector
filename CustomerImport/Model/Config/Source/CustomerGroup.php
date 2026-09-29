@@ -19,6 +19,7 @@
 
 namespace MageOS\NetSuiteConnector\CustomerImport\Model\Config\Source;
 
+use Magento\Customer\Api\Data\GroupInterface;
 use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SearchCriteriaInterface;
@@ -64,7 +65,7 @@ class CustomerGroup implements \Magento\Framework\Data\OptionSourceInterface
         $options = [];
         $searchCriteria = $this->searchCriteriaBuilderFactory
             ->create()
-            ->addFilter('customer_group_id', self::NOT_LOGGED_ID, 'neq')
+            ->addFilter(GroupInterface::ID, self::NOT_LOGGED_ID, 'neq')
             ->create();
         $groupList = $this->groupRepository->getList($searchCriteria)->getItems();
         foreach ($groupList as $group) {

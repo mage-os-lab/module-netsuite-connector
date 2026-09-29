@@ -77,7 +77,7 @@ class CustomerGroupTest extends TestCase
         $builder = $this->createMock(SearchCriteriaBuilder::class);
         $builder->expects($this->once())
             ->method('addFilter')
-            ->with('customer_group_id', 0, 'neq')
+            ->with(GroupInterface::ID, 0, 'neq')
             ->willReturnSelf();
         $builder->method('create')->willReturn($searchCriteria);
 
