@@ -269,6 +269,39 @@ class ConnectorConfigTest extends TestCase
     }
 
     /**
+     * Connection values saved with surrounding whitespace must be returned without it.
+     */
+    #[DataProvider('untrimmedConnectionValueProvider')]
+    public function testItTrimsConnectionValues(string $method, string $path, string $stored, string $expected): void
+    {
+        $config = $this->createConfig([$path => $stored]);
+
+        $this->assertSame($expected, $config->{$method}('default'));
+    }
+
+    /**
+     * Data set of getter, config path, stored value with whitespace and the expected value.
+     *
+     * @return array<string, array{string, string, string, string}>
+     */
+    public static function untrimmedConnectionValueProvider(): array
+    {
+        return [
+            'host with a trailing space and slash' => [
+                'getHost',
+                'mageos_netsuite/general/host',
+                ' https://acme.suitetalk.api.netsuite.com/ ',
+                'https://acme.suitetalk.api.netsuite.com',
+            ],
+            'account id' => ['getAccountId', 'mageos_netsuite/general/account_id', "TSTDRV1234567\n", 'TSTDRV1234567'],
+            'consumer key' => ['getConsumerKey', 'mageos_netsuite/general/consumer_key', ' key ', 'key'],
+            'consumer secret' => ['getConsumerSecret', 'mageos_netsuite/general/consumer_secret', "secret\t", 'secret'],
+            'token id' => ['getTokenId', 'mageos_netsuite/general/token_id', ' token', 'token'],
+            'token secret' => ['getTokenSecret', 'mageos_netsuite/general/token_secret', 'secret ', 'secret'],
+        ];
+    }
+
+    /**
      * The retry count is a hardcoded constant and never reads the scope config.
      */
     public function testItReturnsAFixedRetryCount(): void

@@ -184,6 +184,10 @@ class Management
     }
 
     /**
+     * Connection data typed into the admin form (Test Connection), normalised like ConnectorConfig does
+     * with saved values: a pasted value often carries a stray space, which breaks the WSDL URL or the
+     * token signature with errors that do not point at it.
+     *
      * @param $connectionData
      * @return array
      */
@@ -191,12 +195,12 @@ class Management
     {
         return [
             "endpoint" => $this->connectorConfig->getEndpoint(),
-            "host" => $connectionData['host'],
-            "account" => $connectionData['account_id'],
-            "consumerKey" => $connectionData['consumer_key'],
-            "consumerSecret" => $connectionData['consumer_secret'],
-            "token" => $connectionData['token_id'],
-            "tokenSecret" => $connectionData['token_secret']
+            "host" => rtrim(trim((string)$connectionData['host']), '/'),
+            "account" => trim((string)$connectionData['account_id']),
+            "consumerKey" => trim((string)$connectionData['consumer_key']),
+            "consumerSecret" => trim((string)$connectionData['consumer_secret']),
+            "token" => trim((string)$connectionData['token_id']),
+            "tokenSecret" => trim((string)$connectionData['token_secret'])
         ];
     }
 }

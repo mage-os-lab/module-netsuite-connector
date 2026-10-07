@@ -21,6 +21,7 @@ namespace MageOS\NetSuiteConnector\Test\Unit\Core\Model\NetSuite\Service;
 use MageOS\NetSuiteConnector\Core\Exception\NetSuiteRuntimeException;
 use MageOS\NetSuiteConnector\Core\Model\Config\ConnectorConfig;
 use MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\ClassMap;
+use MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\Constructor;
 use MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\ConstructorFactory;
 use MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\Management;
 use MageOS\NetSuiteConnector\Core\Registry\ModuleRegistry;
@@ -82,6 +83,45 @@ class ManagementTest extends TestCase
         $options = $this->management()->getNetSuiteServiceOptions('default');
 
         $this->assertSame((new ClassMap())->get(), $options['classmap']);
+    }
+
+    /**
+     * Values typed into the admin form (Test Connection) reach the SOAP client without surrounding
+     * whitespace, and the host without a trailing slash, as ConnectorConfig returns saved values
+     */
+    public function testConnectionDataFromTheFormIsTrimmed(): void
+    {
+        $connectorConfig = $this->createStub(ConnectorConfig::class);
+        $connectorConfig->method('getEndpoint')->willReturn('2024_2');
+
+        $created = [];
+        $constructorFactory = $this->createStub(ConstructorFactory::class);
+        $constructorFactory->method('create')->willReturnCallback(
+            function (array $arguments) use (&$created) {
+                $created = $arguments;
+                return $this->createStub(Constructor::class);
+            }
+        );
+
+        $management = new Management(new ModuleRegistry(), $connectorConfig, $constructorFactory);
+        $management->get([
+            'host' => ' https://1234567-sb1.suitetalk.api.netsuite.com/ ',
+            'account_id' => "1234567_SB1\n",
+            'consumer_key' => ' consumer-key',
+            'consumer_secret' => "consumer-secret\t",
+            'token_id' => 'token-id ',
+            'token_secret' => ' token-secret ',
+        ]);
+
+        $this->assertSame([
+            'endpoint' => '2024_2',
+            'host' => 'https://1234567-sb1.suitetalk.api.netsuite.com',
+            'account' => '1234567_SB1',
+            'consumerKey' => 'consumer-key',
+            'consumerSecret' => 'consumer-secret',
+            'token' => 'token-id',
+            'tokenSecret' => 'token-secret',
+        ], $created['config']);
     }
 
     private function management(): Management

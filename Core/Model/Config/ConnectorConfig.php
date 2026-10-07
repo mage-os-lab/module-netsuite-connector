@@ -66,9 +66,13 @@ class ConnectorConfig
         return (bool) $this->scopeConfig->getValue(self::PATH_ENABLED);
     }
 
+    /**
+     * Connection values are trimmed when read as well as when saved (Backend\TrimmedValue,
+     * Backend\TrimmedEncrypted), so values saved before the backend models existed work too
+     */
     public function getHost(): string
     {
-        return rtrim((string)$this->getCached(self::PATH_HOST), '/');
+        return rtrim(trim((string)$this->getCached(self::PATH_HOST)), '/');
     }
 
     public function getEndpoint(): string
@@ -78,7 +82,7 @@ class ConnectorConfig
 
     public function getAccountId(): string
     {
-        return (string)$this->getCached(self::PATH_ACCOUNT_ID);
+        return trim((string)$this->getCached(self::PATH_ACCOUNT_ID));
     }
 
     public function getRetriesCount(): int
@@ -102,9 +106,9 @@ class ConnectorConfig
      */
     public function getConsumerKey(string $runMode)
     {
-        return $this->getCached(
+        return trim((string)$this->getCached(
             sprintf(self::PATH_CONSUMER_KEY, $this->getSystemConfigPathForRunMode($runMode))
-        );
+        ));
     }
 
     /**
@@ -112,11 +116,11 @@ class ConnectorConfig
      */
     public function getConsumerSecret(string $runMode)
     {
-        return $this->encryptor->decrypt(
+        return trim($this->encryptor->decrypt(
             (string)$this->getCached(
                 sprintf(self::PATH_CONSUMER_SECRET, $this->getSystemConfigPathForRunMode($runMode))
             )
-        );
+        ));
     }
 
     /**
@@ -124,9 +128,9 @@ class ConnectorConfig
      */
     public function getTokenId(string $runMode)
     {
-        return $this->getCached(
+        return trim((string)$this->getCached(
             sprintf(self::PATH_TOKEN_ID, $this->getSystemConfigPathForRunMode($runMode))
-        );
+        ));
     }
 
     /**
@@ -134,11 +138,11 @@ class ConnectorConfig
      */
     public function getTokenSecret(string $runMode)
     {
-        return $this->encryptor->decrypt(
+        return trim($this->encryptor->decrypt(
             (string)$this->getCached(
                 sprintf(self::PATH_TOKEN_SECRET, $this->getSystemConfigPathForRunMode($runMode))
             )
-        );
+        ));
     }
 
     public function getSystemConfigPathForRunMode($runMode): string
