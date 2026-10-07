@@ -20,6 +20,7 @@ namespace MageOS\NetSuiteConnector\Test\Unit\Core\Model\NetSuite\Service;
 
 use MageOS\NetSuiteConnector\Core\Exception\NetSuiteRuntimeException;
 use MageOS\NetSuiteConnector\Core\Model\Config\ConnectorConfig;
+use MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\ClassMap;
 use MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\ConstructorFactory;
 use MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\Management;
 use MageOS\NetSuiteConnector\Core\Registry\ModuleRegistry;
@@ -74,6 +75,13 @@ class ManagementTest extends TestCase
         } catch (NetSuiteRuntimeException $e) {
             $this->assertSame(3, $attempts);
         }
+    }
+
+    public function testTheSoapClientGetsTheConnectorClassMap(): void
+    {
+        $options = $this->management()->getNetSuiteServiceOptions('default');
+
+        $this->assertSame((new ClassMap())->get(), $options['classmap']);
     }
 
     private function management(): Management

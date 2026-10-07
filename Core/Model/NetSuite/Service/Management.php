@@ -43,16 +43,19 @@ class Management
     private \MageOS\NetSuiteConnector\Core\Model\Config\ConnectorConfig $connectorConfig;
     private \MageOS\NetSuiteConnector\Core\Registry\ModuleRegistry $registry;
     private \MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\ConstructorFactory $constructorFactory;
+    private ClassMap $classMap;
     protected array $netsuiteService = [];
 
     public function __construct(
         \MageOS\NetSuiteConnector\Core\Registry\ModuleRegistry $registry,
         \MageOS\NetSuiteConnector\Core\Model\Config\ConnectorConfig $connectorConfig,
-        \MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\ConstructorFactory $constructorFactory
+        \MageOS\NetSuiteConnector\Core\Model\NetSuite\Service\ConstructorFactory $constructorFactory,
+        ?ClassMap $classMap = null
     ) {
         $this->connectorConfig = $connectorConfig;
         $this->registry = $registry;
         $this->constructorFactory = $constructorFactory;
+        $this->classMap = $classMap ?? new ClassMap();
     }
 
     /**
@@ -106,7 +109,8 @@ class Management
         $timeout = $this->connectorConfig->getSoapRequestTimeout();
         $options = [
             'connection_timeout' =>  $timeout < 60 ? 60 : $timeout,
-            'cache_wsdl' => WSDL_CACHE_DISK
+            'cache_wsdl' => WSDL_CACHE_DISK,
+            'classmap' => $this->classMap->get()
         ];
 
         return $options;
