@@ -39,7 +39,11 @@ class BeforeInvoiceRepositorySave
     public function beforeSave(InvoiceRepositoryInterface $subject, InvoiceInterface $invoice): array
     {
         $extensionAttribute = $invoice->getExtensionAttributes();
-        if ($extensionAttribute && method_exists($extensionAttribute, 'getNetsuiteInternalId')) {
+        // The extension attributes are not loaded with the invoice, so null means "not set", not "clear it"
+        if ($extensionAttribute
+            && method_exists($extensionAttribute, 'getNetsuiteInternalId')
+            && $extensionAttribute->getNetsuiteInternalId() !== null
+        ) {
             $invoice->setNetsuiteInternalId($extensionAttribute->getNetsuiteInternalId());
         }
         return [$invoice];
