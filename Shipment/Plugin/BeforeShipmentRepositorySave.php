@@ -39,8 +39,13 @@ class BeforeShipmentRepositorySave
     public function beforeSave(ShipmentRepositoryInterface $subject, ShipmentInterface $shipment): array
     {
         $extensionAttribute = $shipment->getExtensionAttributes();
-        $shipment->setNetsuiteInternalId($extensionAttribute->getNetsuiteInternalId());
-        $shipment->setNetsuiteLastImportDate($extensionAttribute->getNetsuiteLastImportDate());
+        // The extension attributes are not loaded with the shipment, so null means "not set", not "clear it"
+        if ($extensionAttribute && $extensionAttribute->getNetsuiteInternalId() !== null) {
+            $shipment->setNetsuiteInternalId($extensionAttribute->getNetsuiteInternalId());
+        }
+        if ($extensionAttribute && $extensionAttribute->getNetsuiteLastImportDate() !== null) {
+            $shipment->setNetsuiteLastImportDate($extensionAttribute->getNetsuiteLastImportDate());
+        }
         return [$shipment];
     }
 }

@@ -315,6 +315,7 @@
     <preference for="MageOS\NetSuiteConnector\Order\Api\OrderRegistryInterface" type="MageOS\NetSuiteConnector\Order\Model\OrderRegistry" />
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="mageos_netsuite_order_before_save" type="MageOS\NetSuiteConnector\Order\Plugin\BeforeOrderRepositorySave"/>
+        <plugin name="mageos_netsuite_order_after_get" type="MageOS\NetSuiteConnector\Order\Plugin\AfterOrderRepositoryGet"/>
     </type>
     <type name="\Magento\Sales\Model\ResourceModel\Order\Handler\State">
         <plugin name="mageos_netsuite_around_check_status" type="\MageOS\NetSuiteConnector\Order\Plugin\StateHandler"/>
@@ -488,6 +489,7 @@
     </type>
     <type name="Magento\Sales\Api\InvoiceRepositoryInterface">
         <plugin name="mageos_netsuite_invoice_before_save" type="MageOS\NetSuiteConnector\Invoice\Plugin\BeforeInvoiceRepositorySave"/>
+        <plugin name="mageos_netsuite_invoice_after_get" type="MageOS\NetSuiteConnector\Invoice\Plugin\AfterInvoiceRepositoryGet"/>
     </type>
     <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
         <arguments>
@@ -558,6 +560,7 @@
     </type>
     <type name="Magento\Sales\Api\ShipmentRepositoryInterface">
         <plugin name="mageos_netsuite_shipment_before_save" type="MageOS\NetSuiteConnector\Shipment\Plugin\BeforeShipmentRepositorySave"/>
+        <plugin name="mageos_netsuite_shipment_after_get" type="MageOS\NetSuiteConnector\Shipment\Plugin\AfterShipmentRepositoryGet"/>
     </type>
     <type name="MageOS\NetSuiteConnector\Core\Model\Process\ImportProcessor">
         <arguments>

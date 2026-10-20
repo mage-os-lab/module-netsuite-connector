@@ -39,8 +39,11 @@ class BeforeOrderRepositorySave
     public function beforeSave(OrderRepositoryInterface $subject, OrderInterface $order): array
     {
         $extensionAttribute = $order->getExtensionAttributes();
-        if ($extensionAttribute) {
+        // The extension attributes are not loaded with the order, so null means "not set", not "clear it"
+        if ($extensionAttribute && $extensionAttribute->getNetsuiteInternalId() !== null) {
             $order->setNetsuiteInternalId($extensionAttribute->getNetsuiteInternalId());
+        }
+        if ($extensionAttribute && $extensionAttribute->getNetsuiteLastImportDate() !== null) {
             $order->setNetsuiteLastImportDate($extensionAttribute->getNetsuiteLastImportDate());
         }
 
